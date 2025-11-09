@@ -57,11 +57,29 @@ These tutorials are designed for:
 
 ## Setup
 
+### Running the Tutorial Website Locally
+
+The tutorial website is built with Jekyll. To view it with proper styling:
+
 ```bash
 # Clone the repository
 git clone https://github.com/OMaroua/Tutorials.git
 cd Tutorials
 
+# Install Jekyll and dependencies (first time only)
+bundle install
+
+# Serve the website locally
+bundle exec jekyll serve
+
+# Open your browser to http://localhost:4000/Tutorials/
+```
+
+**Important:** Don't open the HTML/MD files directly in your browser - they won't have styling! Always use Jekyll to serve the site.
+
+### Running the Tutorial Code
+
+```bash
 # Navigate to a specific tutorial
 cd 01-VAE-Tutorial
 

@@ -3,6 +3,8 @@ layout: default
 title: Home
 ---
 
+<div class="home-content" markdown="1">
+
 # AI & Machine Learning Tutorials
 
 A collection of comprehensive tutorials covering advanced AI and Machine Learning topics, with focus on Computer Vision, Generative Models, and Healthcare Applications.
@@ -10,6 +12,8 @@ A collection of comprehensive tutorials covering advanced AI and Machine Learnin
 ---
 
 ## Available Tutorials
+
+<div class="tutorial-card" markdown="1">
 
 ### 1. [Variational Autoencoders (VAEs)](01-VAE-Tutorial/tutorial.html)
 
@@ -25,6 +29,8 @@ Learn how to build and train VAEs from scratch, understand the latent space, and
 **Prerequisites:** Python, PyTorch, Basic probability theory
 
 [Start Tutorial →](01-VAE-Tutorial/tutorial.html)
+
+</div>
 
 ---
 
@@ -102,4 +108,6 @@ Connect: [GitHub](https://github.com/OMaroua) | [LinkedIn](your-linkedin-url)
 ## License
 
 These tutorials are released under the MIT License. Feel free to use them for learning and teaching!
+
+</div>
 
