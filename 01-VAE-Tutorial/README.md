@@ -1,26 +1,26 @@
-# 🎨 Variational Autoencoders (VAEs) Tutorial
+# Variational Autoencoders (VAEs) Tutorial
 
-## 📖 **Overview**
+## Overview
 
 This tutorial provides a comprehensive introduction to **Variational Autoencoders (VAEs)**, one of the most important generative models in deep learning. You'll learn the theory behind VAEs and implement one from scratch using PyTorch.
 
 ---
 
-## 🎯 **Learning Objectives**
+## Learning Objectives
 
 By the end of this tutorial, you will be able to:
 
-- ✅ Understand the mathematical foundation of VAEs
-- ✅ Implement the encoder and decoder networks
-- ✅ Apply the reparameterization trick
-- ✅ Compute and optimize the VAE loss (reconstruction + KL divergence)
-- ✅ Generate new samples from the latent space
-- ✅ Visualize and explore the latent space representation
-- ✅ Apply VAEs to real datasets (MNIST, Fashion-MNIST, etc.)
+- Understand the mathematical foundation of VAEs
+- Implement the encoder and decoder networks
+- Apply the reparameterization trick
+- Compute and optimize the VAE loss (reconstruction + KL divergence)
+- Generate new samples from the latent space
+- Visualize and explore the latent space representation
+- Apply VAEs to real datasets (MNIST, Fashion-MNIST, etc.)
 
 ---
 
-## 📚 **What You'll Learn**
+## What You'll Learn
 
 ### 1. **VAE Theory**
 - Traditional autoencoders vs. variational autoencoders
@@ -47,7 +47,7 @@ By the end of this tutorial, you will be able to:
 
 ---
 
-## 🛠️ **Prerequisites**
+## Prerequisites
 
 **Required Knowledge:**
 - Python programming
@@ -62,7 +62,7 @@ By the end of this tutorial, you will be able to:
 
 ---
 
-## 📦 **Installation**
+## Installation
 
 ```bash
 # Navigate to this tutorial folder
@@ -77,7 +77,7 @@ jupyter notebook VAE_Tutorial.ipynb
 
 ---
 
-## 📁 **Folder Structure**
+## Folder Structure
 
 ```
 01-VAE-Tutorial/
@@ -102,7 +102,7 @@ jupyter notebook VAE_Tutorial.ipynb
 
 ---
 
-## 🚀 **Quick Start**
+## Quick Start
 
 ### Option 1: Interactive Notebook (Recommended)
 ```bash
@@ -116,7 +116,7 @@ python src/train.py --dataset mnist --epochs 50 --latent-dim 20
 
 ---
 
-## 📊 **Datasets Used**
+## Datasets Used
 
 - **MNIST**: Handwritten digits (28x28 grayscale)
 - **Fashion-MNIST**: Clothing items (28x28 grayscale)
@@ -126,7 +126,7 @@ All datasets are automatically downloaded via PyTorch's `torchvision`.
 
 ---
 
-## 🔬 **Key Concepts Covered**
+## Key Concepts Covered
 
 ### VAE Loss Function
 ```python
@@ -147,7 +147,7 @@ This allows gradients to flow through the stochastic sampling operation.
 
 ---
 
-## 📈 **Expected Results**
+## Expected Results
 
 After training, you should be able to:
 - Generate realistic new samples
@@ -157,7 +157,7 @@ After training, you should be able to:
 
 ---
 
-## 🎓 **Further Reading**
+## Further Reading
 
 - [Original VAE Paper](https://arxiv.org/abs/1312.6114) - Kingma & Welling (2013)
 - [β-VAE Paper](https://openreview.net/forum?id=Sy2fzU9gl) - Higgins et al. (2017)
@@ -165,7 +165,7 @@ After training, you should be able to:
 
 ---
 
-## 💡 **Tips & Tricks**
+## Tips & Tricks
 
 1. **Start with small latent dimensions** (2-20) to visualize the latent space
 2. **Balance the loss terms** - if reconstruction is poor, decrease β
@@ -174,7 +174,7 @@ After training, you should be able to:
 
 ---
 
-## 🐛 **Common Issues**
+## Common Issues
 
 | Issue | Solution |
 |-------|----------|
@@ -184,7 +184,7 @@ After training, you should be able to:
 
 ---
 
-## 🤝 **Contributing**
+## Contributing
 
 Found a bug or have a suggestion? Feel free to:
 - Open an issue
@@ -193,24 +193,24 @@ Found a bug or have a suggestion? Feel free to:
 
 ---
 
-## 👩‍💻 **Author**
+## Author
 
 **Maroua Oukrid**  
 Computer Vision & Healthcare AI Researcher
 
-📧 marouaoukrid56@gmail.com  
-💼 [LinkedIn](https://linkedin.com/in/Maroua-Oukrid)  
-🐱 [GitHub](https://github.com/OMaroua)
+Email: marouaoukrid56@gmail.com  
+[LinkedIn](https://linkedin.com/in/Maroua-Oukrid)  
+[GitHub](https://github.com/OMaroua)
 
 ---
 
-## 📄 **License**
+## License
 
 MIT License - Feel free to use for learning and teaching!
 
 ---
 
-⭐ **If you find this tutorial helpful, please star the repository!**
+If you find this tutorial helpful, please star the repository!
 
 **Next Tutorial:** [Diffusion Models →](../02-Diffusion-Models/)
 

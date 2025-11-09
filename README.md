@@ -1,10 +1,10 @@
-# 🧠 AI & Machine Learning Tutorials
+# AI & Machine Learning Tutorials
 
 A collection of comprehensive tutorials covering advanced AI and Machine Learning topics, with focus on Computer Vision, Generative Models, and Healthcare Applications.
 
-## 📚 **Tutorials Available**
+## Tutorials Available
 
-### 1. **Variational Autoencoders (VAEs)** 🎨
+### 1. Variational Autoencoders (VAEs)
 Learn how to build and train VAEs from scratch, understand the latent space, and apply them to real-world problems.
 
 **Topics Covered:**
@@ -14,13 +14,13 @@ Learn how to build and train VAEs from scratch, understand the latent space, and
 - Latent space exploration
 - Applications in image generation
 
-**Status:** ✅ Available  
+**Status:** Available  
 **Level:** Intermediate to Advanced  
-**[View Tutorial →](./01-VAE-Tutorial/)**
+**[View Tutorial](./01-VAE-Tutorial/)**
 
 ---
 
-## 🚀 **Coming Soon**
+## Coming Soon
 
 - **Diffusion Models** - Understanding and implementing diffusion-based generative models
 - **Semantic Segmentation** - Real-time segmentation with DDRNet
@@ -30,17 +30,17 @@ Learn how to build and train VAEs from scratch, understand the latent space, and
 
 ---
 
-## 🎯 **Who Are These For?**
+## Who Are These For?
 
 These tutorials are designed for:
-- 🎓 Students learning advanced ML concepts
-- 💼 Professionals wanting to deepen their AI knowledge
-- 🔬 Researchers exploring new architectures
-- 🚀 Anyone interested in practical AI implementations
+- Students learning advanced ML concepts
+- Professionals wanting to deepen their AI knowledge
+- Researchers exploring new architectures
+- Anyone interested in practical AI implementations
 
 ---
 
-## 📋 **Prerequisites**
+## Prerequisites
 
 **Required:**
 - Python 3.8+
@@ -53,7 +53,7 @@ These tutorials are designed for:
 
 ---
 
-## 🛠️ **Setup**
+## Setup
 
 ```bash
 # Clone the repository
@@ -72,39 +72,39 @@ jupyter notebook VAE_Tutorial.ipynb
 
 ---
 
-## 📖 **How to Use**
+## How to Use
 
 Each tutorial folder contains:
-- 📓 **Jupyter Notebook** - Interactive tutorial with code and explanations
-- 📝 **README.md** - Tutorial overview and learning objectives
-- 📦 **requirements.txt** - Python dependencies
-- 🎨 **assets/** - Images and visualizations
-- 📊 **data/** - Sample datasets (if applicable)
+- **Jupyter Notebook** - Interactive tutorial with code and explanations
+- **README.md** - Tutorial overview and learning objectives
+- **requirements.txt** - Python dependencies
+- **assets/** - Images and visualizations
+- **data/** - Sample datasets (if applicable)
 
 ---
 
-## 💡 **Contributing**
+## Contributing
 
 Found an issue or want to suggest a tutorial topic? Feel free to open an issue or submit a pull request!
 
 ---
 
-## 👩‍💻 **Author**
+## Author
 
 **Maroua Oukrid**  
 AI Researcher | Computer Vision & Healthcare AI
 
-- 💼 [LinkedIn](https://linkedin.com/in/Maroua-Oukrid)
-- 🐱 [GitHub](https://github.com/OMaroua)
-- 📧 marouaoukrid56@gmail.com
+- [LinkedIn](https://linkedin.com/in/Maroua-Oukrid)
+- [GitHub](https://github.com/OMaroua)
+- marouaoukrid56@gmail.com
 
 ---
 
-## 📄 **License**
+## License
 
 MIT License - Feel free to use these tutorials for learning and teaching!
 
 ---
 
-⭐ **If you find these tutorials helpful, please consider giving the repository a star!**
+If you find these tutorials helpful, please consider giving the repository a star!
 
