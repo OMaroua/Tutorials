@@ -95,11 +95,16 @@ where $\theta$ represents the parameters of the decoder network.
 
 The autoencoder is trained by minimizing the **reconstruction error**, which measures how well the decoder can reconstruct the original input from the latent representation:
 
-$$\mathcal{L}_{AE}(\mathbf{x}, \hat{\mathbf{x}}) = \mathbb{E}_{\mathbf{x} \sim p_{data}(\mathbf{x})} [\| \mathbf{x} - g_\theta(f_\phi(\mathbf{x})) \|^2]$$
+$$
+\mathcal{L}_{AE}(\mathbf{x}, \hat{\mathbf{x}}) = \mathbb{E}_{\mathbf{x} \sim p_{data}(\mathbf{x})} [\| \mathbf{x} - g_\theta(f_\phi(\mathbf{x})) \|^2]
+$$
 
 Common choices for the reconstruction loss include:
 - **Mean Squared Error (MSE)**: $\| \mathbf{x} - \hat{\mathbf{x}} \|^2$ for continuous data
 - **Binary Cross-Entropy (BCE)**: $-\sum_i [x_i \log \hat{x}_i + (1-x_i) \log(1-\hat{x}_i)]$ for binary data
+
+![Autoencoder Architecture](https://via.placeholder.com/800x300/4a1a8a/ffffff?text=Autoencoder+Architecture)  
+*Figure 1: Autoencoder architecture showing the encoder-decoder structure with latent bottleneck*
 
 ### Training Objective
 
@@ -150,10 +155,19 @@ The VAE assumes the following generative story for how data is created:
 2. Generate data from a conditional distribution: $\mathbf{x} \sim p_\theta(\mathbf{x}|\mathbf{z})$
 
 The prior is typically chosen to be a standard Gaussian:
-$$p(\mathbf{z}) = \mathcal{N}(\mathbf{z}; \mathbf{0}, \mathbf{I})$$
+
+$$
+p(\mathbf{z}) = \mathcal{N}(\mathbf{z}; \mathbf{0}, \mathbf{I})
+$$
 
 The decoder network parameterizes $p_\theta(\mathbf{x}|\mathbf{z})$, often as:
-$$p_\theta(\mathbf{x}|\mathbf{z}) = \mathcal{N}(\mathbf{x}; \boldsymbol{\mu}_\theta(\mathbf{z}), \boldsymbol{\sigma}_\theta^2(\mathbf{z})\mathbf{I})$$
+
+$$
+p_\theta(\mathbf{x}|\mathbf{z}) = \mathcal{N}(\mathbf{x}; \boldsymbol{\mu}_\theta(\mathbf{z}), \boldsymbol{\sigma}_\theta^2(\mathbf{z})\mathbf{I})
+$$
+
+![VAE Architecture](https://via.placeholder.com/900x400/6c5ce7/ffffff?text=VAE+Architecture+with+Reparameterization)  
+*Figure 2: Variational Autoencoder architecture showing the probabilistic encoder and decoder*
 
 #### Inference Model (Encoder)
 
