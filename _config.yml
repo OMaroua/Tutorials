@@ -1,0 +1,53 @@
+# Site settings
+title: "AI & ML Tutorials"
+description: "Comprehensive tutorials covering advanced AI and Machine Learning topics"
+author: "Maroua Oukrid"
+email: "your.email@example.com"
+url: "https://OMaroua.github.io"
+baseurl: "/Tutorials"
+
+# Theme
+theme: jekyll-theme-cayman
+remote_theme: pages-themes/cayman@v0.2.0
+plugins:
+- jekyll-remote-theme
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  math_engine: mathjax
+  syntax_highlighter: rouge
+
+# Collections
+collections:
+  tutorials:
+    output: true
+    permalink: /:collection/:name
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "tutorials"
+    values:
+      layout: "tutorial"
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - src/
+  - data/
+  - models/
+  - __pycache__/
+  - "*.py"
+  - "*.pth"
+  - "*.pt"
+  - requirements.txt
+

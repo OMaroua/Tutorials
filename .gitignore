@@ -69,3 +69,14 @@ Thumbs.db
 *.tar.gz
 *.rar
 
+# Jekyll / GitHub Pages
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+vendor/
+
+# Ruby / Bundler
+Gemfile.lock
+.bundle/
+

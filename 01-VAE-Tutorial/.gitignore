@@ -1,0 +1,16 @@
+# Data and models
+data/
+models/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Model checkpoints
+*.pt
+*.pth
+
+# Jupyter
+.ipynb_checkpoints/
+
