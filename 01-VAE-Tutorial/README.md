@@ -203,53 +203,150 @@ This gives us two terms:
    - KL divergence between approximate posterior and prior
    - Encourages latent distribution to match prior
 
-#### KL Divergence for Gaussian Distributions
+#### Complete KL Divergence Derivation for Gaussian Distributions
 
-For $q_\phi(z|x) = \mathcal{N}(\mu, \text{diag}(\sigma^2))$ and $p(z) = \mathcal{N}(0, I)$:
+We need to compute $D_{KL}(q_\phi(z|x) \| p(z))$ where:
+- $q_\phi(z|x) = \mathcal{N}(\mu, \text{diag}(\sigma^2))$ (approximate posterior)
+- $p(z) = \mathcal{N}(0, I)$ (prior)
+
+**Step 1: KL Divergence Definition**
 
 $$D_{KL}(q_\phi(z|x) \| p(z)) = \int q_\phi(z|x) \log \frac{q_\phi(z|x)}{p(z)} dz$$
 
-Using the formula for KL between two Gaussians:
+$$= \mathbb{E}_{q_\phi(z|x)}\left[\log q_\phi(z|x) - \log p(z)\right]$$
 
-$$D_{KL}(\mathcal{N}(\mu, \Sigma_1) \| \mathcal{N}(0, I)) = \frac{1}{2}\left(\text{tr}(\Sigma_1) + \mu^T\mu - k - \log|\Sigma_1|\right)$$
+**Step 2: Write Out Gaussian PDFs**
 
-For diagonal covariance $\Sigma_1 = \text{diag}(\sigma^2)$:
+For a multivariate Gaussian $\mathcal{N}(\mu, \Sigma)$:
 
-$$D_{KL} = \frac{1}{2} \sum_{i=1}^{k} \left(\sigma_i^2 + \mu_i^2 - 1 - \log(\sigma_i^2)\right)$$
+$$\log p(z) = -\frac{k}{2}\log(2\pi) - \frac{1}{2}\log|\Sigma| - \frac{1}{2}(z-\mu)^T\Sigma^{-1}(z-\mu)$$
 
-$$= -\frac{1}{2} \sum_{i=1}^{k} \left(1 + \log(\sigma_i^2) - \mu_i^2 - \sigma_i^2\right)$$
+For our posterior $q_\phi(z|x) = \mathcal{N}(\mu, \text{diag}(\sigma^2))$:
 
-#### Final Loss Function
+$$\log q_\phi(z|x) = -\frac{k}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^{k}\log(\sigma_i^2) - \frac{1}{2}\sum_{i=1}^{k}\frac{(z_i-\mu_i)^2}{\sigma_i^2}$$
 
-The total loss to minimize (negative ELBO):
+For our prior $p(z) = \mathcal{N}(0, I)$:
+
+$$\log p(z) = -\frac{k}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^{k}z_i^2$$
+
+**Step 3: Compute the Difference**
+
+$$\log q_\phi(z|x) - \log p(z) = -\frac{1}{2}\sum_{i=1}^{k}\log(\sigma_i^2) - \frac{1}{2}\sum_{i=1}^{k}\frac{(z_i-\mu_i)^2}{\sigma_i^2} + \frac{1}{2}\sum_{i=1}^{k}z_i^2$$
+
+**Step 4: Take Expectation w.r.t. $q_\phi(z|x)$**
+
+$$D_{KL} = \mathbb{E}_{z \sim q_\phi(z|x)}\left[-\frac{1}{2}\sum_{i=1}^{k}\log(\sigma_i^2) - \frac{1}{2}\sum_{i=1}^{k}\frac{(z_i-\mu_i)^2}{\sigma_i^2} + \frac{1}{2}\sum_{i=1}^{k}z_i^2\right]$$
+
+**Step 5: Evaluate Each Term**
+
+Term 1: $\mathbb{E}[-\frac{1}{2}\sum_{i=1}^{k}\log(\sigma_i^2)] = -\frac{1}{2}\sum_{i=1}^{k}\log(\sigma_i^2)$ (constant)
+
+Term 2: $\mathbb{E}[-\frac{1}{2}\sum_{i=1}^{k}\frac{(z_i-\mu_i)^2}{\sigma_i^2}] = -\frac{1}{2}\sum_{i=1}^{k}\frac{\mathbb{E}[(z_i-\mu_i)^2]}{\sigma_i^2} = -\frac{1}{2}\sum_{i=1}^{k}\frac{\sigma_i^2}{\sigma_i^2} = -\frac{k}{2}$
+
+Term 3: $\mathbb{E}[\frac{1}{2}\sum_{i=1}^{k}z_i^2]$ where $z_i \sim \mathcal{N}(\mu_i, \sigma_i^2)$
+
+For a Gaussian random variable, $\mathbb{E}[z_i^2] = \text{Var}(z_i) + (\mathbb{E}[z_i])^2 = \sigma_i^2 + \mu_i^2$
+
+Therefore: $\mathbb{E}[\frac{1}{2}\sum_{i=1}^{k}z_i^2] = \frac{1}{2}\sum_{i=1}^{k}(\sigma_i^2 + \mu_i^2)$
+
+**Step 6: Combine All Terms**
+
+$$D_{KL} = -\frac{1}{2}\sum_{i=1}^{k}\log(\sigma_i^2) - \frac{k}{2} + \frac{1}{2}\sum_{i=1}^{k}(\sigma_i^2 + \mu_i^2)$$
+
+$$= \frac{1}{2}\sum_{i=1}^{k}\left(\mu_i^2 + \sigma_i^2 - \log(\sigma_i^2) - 1\right)$$
+
+**Rearranging for implementation:**
+
+$$D_{KL}(q_\phi(z|x) \| p(z)) = -\frac{1}{2}\sum_{i=1}^{k}\left(1 + \log(\sigma_i^2) - \mu_i^2 - \sigma_i^2\right)$$
+
+This is the **closed-form solution** that makes VAE training tractable!
+
+#### Final Loss Function Derivation
+
+**Starting Point: ELBO**
+
+Recall that we want to maximize the ELBO:
+
+$$\mathcal{L}(\theta,\phi;x) = \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)] - D_{KL}(q_\phi(z|x) \| p(z))$$
+
+In practice, we **minimize the negative ELBO**:
 
 $$\mathcal{L}_{\text{total}} = -\mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)] + D_{KL}(q_\phi(z|x) \| p(z))$$
 
 $$= \mathcal{L}_{\text{reconstruction}} + \mathcal{L}_{\text{KL}}$$
 
-**For Gaussian Posterior and Prior:**
+**Reconstruction Loss Derivation:**
 
-With $q_\phi(z|x) = \mathcal{N}(\mu_\phi(x), \sigma_\phi^2(x)I)$ and $p(z) = \mathcal{N}(0, I)$, the KL term has a **closed-form solution**:
+We model $p_\theta(x|z)$ based on the data type:
 
-$$D_{KL}(q_\phi(z|x) \| p(z)) = \frac{1}{2} \sum_{j=1}^{d} \left(\mu_j^2 + \sigma_j^2 - \log(\sigma_j^2) - 1\right)$$
+**For Binary Data (MNIST):**
 
-**Reconstruction Loss:**
+Assume each pixel is independent Bernoulli:
 
-For binary data (MNIST), we use binary cross-entropy:
+$$p_\theta(x|z) = \prod_{i=1}^{D} p_\theta(x_i|z)^{x_i}(1-p_\theta(x_i|z))^{1-x_i}$$
 
-$$\mathcal{L}_{\text{reconstruction}} = -\sum_{i=1}^{D} \left[x_i \log \hat{x}_i + (1-x_i)\log(1-\hat{x}_i)\right]$$
+where $p_\theta(x_i|z) = \hat{x}_i$ is the decoder output.
 
-For continuous data, we use MSE:
+Taking the log:
 
-$$\mathcal{L}_{\text{reconstruction}} = \|x - \hat{x}\|_2^2$$
+$$\log p_\theta(x|z) = \sum_{i=1}^{D}\left[x_i \log \hat{x}_i + (1-x_i)\log(1-\hat{x}_i)\right]$$
 
-where $\hat{x} = g_\theta(z)$ is the decoder output.
+Therefore:
 
-**Complete VAE Training Loss:**
+$$\mathcal{L}_{\text{reconstruction}} = -\mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)] = -\sum_{i=1}^{D}\left[x_i \log \hat{x}_i + (1-x_i)\log(1-\hat{x}_i)\right]$$
 
-$$\mathcal{L}_{VAE}(x) = \|x - g_\theta(z)\|_2^2 + \frac{1}{2} \sum_{j=1}^{d} \left(\mu_j^2 + \sigma_j^2 - \log(\sigma_j^2) - 1\right)$$
+This is **binary cross-entropy**.
 
-where $z = \mu_\phi(x) + \sigma_\phi(x) \odot \epsilon$ and $\epsilon \sim \mathcal{N}(0, I)$.
+**For Continuous Data:**
+
+Assume Gaussian likelihood with fixed variance:
+
+$$p_\theta(x|z) = \mathcal{N}(x; g_\theta(z), \sigma^2I)$$
+
+$$\log p_\theta(x|z) = -\frac{D}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\|x - g_\theta(z)\|^2$$
+
+Ignoring constants:
+
+$$\mathcal{L}_{\text{reconstruction}} \propto \|x - g_\theta(z)\|^2$$
+
+This is **mean squared error (MSE)**.
+
+**KL Loss:**
+
+From our derivation above:
+
+$$\mathcal{L}_{\text{KL}} = D_{KL}(q_\phi(z|x) \| p(z)) = \frac{1}{2} \sum_{j=1}^{d} \left(\mu_j^2 + \sigma_j^2 - \log(\sigma_j^2) - 1\right)$$
+
+**Complete VAE Training Loss (for MNIST with MSE):**
+
+$$\boxed{\mathcal{L}_{VAE}(x) = \frac{1}{D}\|x - g_\theta(z)\|_2^2 + \frac{1}{2d} \sum_{j=1}^{d} \left(\mu_j^2 + \sigma_j^2 - \log(\sigma_j^2) - 1\right)}$$
+
+where:
+- $z = \mu_\phi(x) + \sigma_\phi(x) \odot \epsilon$ with $\epsilon \sim \mathcal{N}(0, I)$
+- $\mu_\phi(x)$ and $\sigma_\phi(x)$ are encoder outputs
+- $g_\theta(z)$ is the decoder output
+- $D$ is the data dimensionality (784 for MNIST)
+- $d$ is the latent dimensionality (2, 3, etc.)
+
+**Alternative with Binary Cross-Entropy:**
+
+$$\boxed{\mathcal{L}_{VAE}(x) = -\sum_{i=1}^{D}\left[x_i \log \hat{x}_i + (1-x_i)\log(1-\hat{x}_i)\right] + \frac{1}{2} \sum_{j=1}^{d} \left(\mu_j^2 + \sigma_j^2 - \log(\sigma_j^2) - 1\right)}$$
+
+**Implementation Note:**
+
+In code, we often work with $\log(\sigma^2)$ instead of $\sigma^2$ for numerical stability:
+
+```python
+# Encoder outputs
+z_mean = encoder_mean(x)
+z_log_var = encoder_log_var(x)  # log(σ²) not σ²
+
+# KL loss
+kl_loss = -0.5 * tf.reduce_sum(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
+
+# Reparameterization
+z = z_mean + tf.exp(0.5 * z_log_var) * epsilon  # σ = exp(0.5 * log(σ²))
+```
 
 ### Training Algorithm
 
