@@ -320,20 +320,16 @@
                 </p>
                 <div class="grid-2">
                     <div class="benefit-card">
-                        <span class="benefit-icon">📈</span>
-                        <p>Increase representational capacity</p>
+                        <p><strong>Increase representational capacity</strong></p>
                     </div>
                     <div class="benefit-card">
-                        <span class="benefit-icon">🎨</span>
-                        <p>Capture more factors of variation</p>
+                        <p><strong>Capture more factors of variation</strong></p>
                     </div>
                     <div class="benefit-card">
-                        <span class="benefit-icon">📉</span>
-                        <p>Reduce reconstruction loss</p>
+                        <p><strong>Reduce reconstruction loss</strong></p>
                     </div>
                     <div class="benefit-card">
-                        <span class="benefit-icon">🔍</span>
-                        <p>Better disentanglement</p>
+                        <p><strong>Better disentanglement</strong></p>
                     </div>
                 </div>
 
@@ -377,9 +373,9 @@ latent_dim = 3  # Changed from 2
                 <div class="observations">
                     <h4>Key Observations</h4>
                     <ul>
-                        <li>✅ Each dimension contributes meaningful variation</li>
-                        <li>✅ Clusters remain coherent across all projections</li>
-                        <li>✅ No single dimension dominates</li>
+                        <li>Each dimension contributes meaningful variation</li>
+                        <li>Clusters remain coherent across all projections</li>
+                        <li>No single dimension dominates</li>
                     </ul>
                 </div>
             </div>
@@ -406,10 +402,10 @@ latent_dim = 3  # Changed from 2
                 <div class="observations">
                     <h4>Key Observations</h4>
                     <ul>
-                        <li>✅ Different slices show different digit styles</li>
-                        <li>✅ z₂ primarily modulates stroke thickness and style</li>
-                        <li>✅ z₀ and z₁ capture digit identity</li>
-                        <li>✅ Smooth transitions demonstrate continuity</li>
+                        <li>Different slices show different digit styles</li>
+                        <li>z₂ primarily modulates stroke thickness and style</li>
+                        <li>z₀ and z₁ capture digit identity</li>
+                        <li>Smooth transitions demonstrate continuity</li>
                     </ul>
                 </div>
             </div>
@@ -480,15 +476,15 @@ z = z_mean + tf.matmul(epsilon, L.T)</code></pre>
                 <div class="observations">
                     <h4>Key Observations</h4>
                     <ul>
-                        <li>✅ Manifold appears <strong>tilted and stretched</strong></li>
-                        <li>✅ Latent clusters form elongated, rotated patterns</li>
-                        <li>✅ Geometry matches correlation structure in Σ</li>
-                        <li>✅ Reconstruction quality remains similar to isotropic case</li>
+                        <li>Manifold appears <strong>tilted and stretched</strong></li>
+                        <li>Latent clusters form elongated, rotated patterns</li>
+                        <li>Geometry matches correlation structure in Σ</li>
+                        <li>Reconstruction quality remains similar to isotropic case</li>
                     </ul>
                 </div>
 
                 <div class="info-box info-box-green">
-                    <strong>💡 Discussion:</strong> Introducing correlation adds flexibility by allowing latent dimensions to capture related factors of variation. While reconstruction remains comparable, the latent geometry becomes more structured and interpretable.
+                    <strong>Discussion:</strong> Introducing correlation adds flexibility by allowing latent dimensions to capture related factors of variation. While reconstruction remains comparable, the latent geometry becomes more structured and interpretable.
                 </div>
             </div>
         </section>
@@ -665,7 +661,7 @@ plt.show()</code></pre>
                 <h3>Key Findings</h3>
                 <div class="findings-grid">
                     <div class="finding-card">
-                        <h4>🎨 2D Latent Space</h4>
+                        <h4>2D Latent Space</h4>
                         <ul>
                             <li>Easy to visualize and interpret</li>
                             <li>Clear digit clustering</li>
@@ -674,7 +670,7 @@ plt.show()</code></pre>
                         </ul>
                     </div>
                     <div class="finding-card">
-                        <h4>📦 3D Latent Space</h4>
+                        <h4>3D Latent Space</h4>
                         <ul>
                             <li>Slightly better reconstruction</li>
                             <li>Captures style variations</li>
@@ -683,7 +679,7 @@ plt.show()</code></pre>
                         </ul>
                     </div>
                     <div class="finding-card">
-                        <h4>🔄 Correlated Prior</h4>
+                        <h4>Correlated Prior</h4>
                         <ul>
                             <li>Reshapes latent geometry</li>
                             <li>Models dependent factors</li>
@@ -712,7 +708,7 @@ plt.show()</code></pre>
                 <h3>When to Use VAEs</h3>
                 <div class="grid-2">
                     <div class="pros-card">
-                        <h4>✅ Good For</h4>
+                        <h4>Good For</h4>
                         <ul>
                             <li>Learning compact data representations</li>
                             <li>Generating new samples similar to training data</li>
@@ -722,7 +718,7 @@ plt.show()</code></pre>
                         </ul>
                     </div>
                     <div class="cons-card">
-                        <h4>❌ Limitations</h4>
+                        <h4>Limitations</h4>
                         <ul>
                             <li>Generated samples may be blurry (vs GANs)</li>
                             <li>Assumes specific distributional form</li>
@@ -800,7 +796,7 @@ plt.show()</code></pre>
                 <a href="https://github.com" target="_blank">View on GitHub</a>
             </p>
             <p class="footer-note">
-                If you found this tutorial helpful, please star the repository! ⭐
+                If you found this tutorial helpful, please star the repository!
             </p>
         </div>
     </footer>

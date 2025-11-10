@@ -37,6 +37,22 @@ In this tutorial, we'll explore VAEs through experiments on the **MNIST** datase
 
 ## What is a VAE?
 
+### Probabilistic Foundations
+
+VAEs are grounded in **variational inference** and **Bayesian deep learning**. The goal is to learn a generative model $p_\theta(x)$ of observed data $x$ by introducing latent variables $z$.
+
+#### Bayesian Formulation
+
+From Bayes' theorem, we have:
+
+$$p_\theta(z|x) = \frac{p_\theta(x|z)p(z)}{p_\theta(x)} = \frac{p_\theta(x|z)p(z)}{\int p_\theta(x|z)p(z)dz}$$
+
+The denominator (marginal likelihood or evidence) is intractable:
+
+$$p_\theta(x) = \int p_\theta(x|z)p(z)dz$$
+
+This integral is computationally infeasible for complex distributions. VAEs solve this using **variational inference**: approximate the true posterior $p_\theta(z|x)$ with a simpler distribution $q_\phi(z|x)$.
+
 ### Key Concepts
 
 A VAE consists of three main components:
@@ -55,22 +71,156 @@ A VAE consists of three main components:
 
 ### The Reparameterization Trick
 
-To enable backpropagation through random sampling, VAEs use the **reparameterization trick**:
+#### The Problem
 
-$$z = \mu + \sigma \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)$$
+We need to compute gradients of the expectation:
 
-This separates the stochastic component ($\epsilon$) from the learnable parameters ($\mu$, $\sigma$).
+$$\nabla_\phi \mathbb{E}_{q_\phi(z|x)}[f(z)]$$
 
-### Loss Function
+Direct sampling $z \sim q_\phi(z|x)$ is non-differentiable with respect to $\phi$.
 
-The VAE optimizes a combination of two objectives:
+#### The Solution
 
-$$\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{reconstruction}} + \beta \cdot \mathcal{L}_{\text{KL}}$$
+Instead of sampling directly from $q_\phi(z|x) = \mathcal{N}(\mu_\phi(x), \sigma_\phi^2(x))$, we:
 
-- **Reconstruction Loss**: Ensures output fidelity (binary cross-entropy or MSE)
-- **KL Divergence**: Regularizes latent space to match the prior
+1. Sample noise: $\epsilon \sim \mathcal{N}(0, I)$
+2. Transform deterministically: $z = \mu_\phi(x) + \sigma_\phi(x) \odot \epsilon$
 
-$$\mathcal{L}_{\text{KL}} = D_{KL}(q(z|x) \| p(z)) = \frac{1}{2} \sum_{i=1}^{k} \left(1 + \log(\sigma_i^2) - \mu_i^2 - \sigma_i^2\right)$$
+This reparameterization allows gradients to flow through $\mu_\phi$ and $\sigma_\phi$:
+
+$$\nabla_\phi \mathbb{E}_{q_\phi(z|x)}[f(z)] = \nabla_\phi \mathbb{E}_{p(\epsilon)}[f(\mu_\phi(x) + \sigma_\phi(x) \odot \epsilon)]$$
+
+$$= \mathbb{E}_{p(\epsilon)}[\nabla_\phi f(\mu_\phi(x) + \sigma_\phi(x) \odot \epsilon)]$$
+
+$$\approx \frac{1}{L}\sum_{l=1}^{L} \nabla_\phi f(\mu_\phi(x) + \sigma_\phi(x) \odot \epsilon^{(l)})$$
+
+where $\epsilon^{(l)} \sim \mathcal{N}(0, I)$.
+
+#### Why It Works
+
+The reparameterization separates:
+- **Stochastic component**: $\epsilon$ (fixed distribution, no parameters)
+- **Deterministic component**: $\mu_\phi, \sigma_\phi$ (learnable parameters)
+
+Gradients can now pass through the deterministic transformation.
+
+### Loss Function Derivation
+
+#### Evidence Lower Bound (ELBO)
+
+Starting from the log-likelihood of the data:
+
+$$\log p_\theta(x) = \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x)]$$
+
+We can decompose this using the variational distribution:
+
+$$\log p_\theta(x) = \mathbb{E}_{q_\phi(z|x)}\left[\log \frac{p_\theta(x,z)}{p_\theta(z|x)}\right]$$
+
+$$= \mathbb{E}_{q_\phi(z|x)}\left[\log \frac{p_\theta(x,z)}{q_\phi(z|x)} \cdot \frac{q_\phi(z|x)}{p_\theta(z|x)}\right]$$
+
+$$= \mathbb{E}_{q_\phi(z|x)}\left[\log \frac{p_\theta(x,z)}{q_\phi(z|x)}\right] + \mathbb{E}_{q_\phi(z|x)}\left[\log \frac{q_\phi(z|x)}{p_\theta(z|x)}\right]$$
+
+$$= \underbrace{\mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x,z) - \log q_\phi(z|x)]}_{\text{ELBO } \mathcal{L}(\theta,\phi;x)} + \underbrace{D_{KL}(q_\phi(z|x) \| p_\theta(z|x))}_{\geq 0}$$
+
+Since KL divergence is non-negative, the ELBO is a lower bound on the log-likelihood:
+
+$$\log p_\theta(x) \geq \mathcal{L}(\theta,\phi;x)$$
+
+#### Decomposition of ELBO
+
+We can further decompose the ELBO:
+
+$$\mathcal{L}(\theta,\phi;x) = \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)] - D_{KL}(q_\phi(z|x) \| p(z))$$
+
+This gives us two terms:
+
+1. **Reconstruction Term**: $\mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)]$
+   - Expected log-likelihood of data given latent code
+   - Encourages accurate reconstruction
+
+2. **Regularization Term**: $D_{KL}(q_\phi(z|x) \| p(z))$
+   - KL divergence between approximate posterior and prior
+   - Encourages latent distribution to match prior
+
+#### KL Divergence for Gaussian Distributions
+
+For $q_\phi(z|x) = \mathcal{N}(\mu, \text{diag}(\sigma^2))$ and $p(z) = \mathcal{N}(0, I)$:
+
+$$D_{KL}(q_\phi(z|x) \| p(z)) = \int q_\phi(z|x) \log \frac{q_\phi(z|x)}{p(z)} dz$$
+
+Using the formula for KL between two Gaussians:
+
+$$D_{KL}(\mathcal{N}(\mu, \Sigma_1) \| \mathcal{N}(0, I)) = \frac{1}{2}\left(\text{tr}(\Sigma_1) + \mu^T\mu - k - \log|\Sigma_1|\right)$$
+
+For diagonal covariance $\Sigma_1 = \text{diag}(\sigma^2)$:
+
+$$D_{KL} = \frac{1}{2} \sum_{i=1}^{k} \left(\sigma_i^2 + \mu_i^2 - 1 - \log(\sigma_i^2)\right)$$
+
+$$= -\frac{1}{2} \sum_{i=1}^{k} \left(1 + \log(\sigma_i^2) - \mu_i^2 - \sigma_i^2\right)$$
+
+#### Final Loss Function
+
+The total loss to minimize (negative ELBO):
+
+$$\mathcal{L}_{\text{total}} = -\mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)] + D_{KL}(q_\phi(z|x) \| p(z))$$
+
+$$= \mathcal{L}_{\text{reconstruction}} + \mathcal{L}_{\text{KL}}$$
+
+For binary data (MNIST), reconstruction loss uses binary cross-entropy:
+
+$$\mathcal{L}_{\text{reconstruction}} = -\sum_{i=1}^{d} x_i \log \hat{x}_i + (1-x_i)\log(1-\hat{x}_i)$$
+
+---
+
+## Mathematical Visualizations
+
+To deepen understanding of the theoretical concepts, we provide several mathematical visualizations. Run the visualization script:
+
+```bash
+cd code
+python visualize_math.py
+```
+
+This generates the following visualizations:
+
+### 1. ELBO Decomposition
+
+![ELBO Decomposition](assets/elbo_decomposition.png)
+
+Shows how the Evidence Lower Bound (ELBO) serves as a lower bound on the log-likelihood and how the loss components evolve during training.
+
+### 2. KL Divergence Behavior
+
+![KL Divergence](assets/kl_divergence_behavior.png)
+
+Illustrates how KL divergence changes with:
+- Mean shifts from the prior
+- Variance deviations from unit variance
+- Parametric relationships
+
+### 3. Reparameterization Trick
+
+![Reparameterization](assets/reparameterization_trick.png)
+
+Visual explanation of how the reparameterization trick enables gradient flow through stochastic sampling.
+
+### 4. Prior vs Posterior
+
+![Prior Posterior](assets/prior_posterior_comparison.png)
+
+Comparison of the prior distribution $p(z)$ with various learned posterior distributions $q_\phi(z|x)$ and their corresponding KL divergences.
+
+### 5. Beta-VAE Trade-off
+
+![Beta VAE](assets/beta_vae_tradeoff.png)
+
+Demonstrates the reconstruction-KL trade-off with different $\beta$ values in the loss function.
+
+### 6. Loss Landscape
+
+![Loss Landscape](assets/loss_landscape.png)
+
+3D visualization of the VAE loss landscape in parameter space, showing the optimization objective.
 
 ---
 
@@ -433,14 +583,14 @@ plt.show()
 
 ### When to Use VAEs
 
-✅ **Good for:**
+**Good for:**
 - Learning compact data representations
 - Generating new samples similar to training data
 - Interpolating between data points
 - Unsupervised feature learning
 - Data compression with probabilistic framework
 
-❌ **Limitations:**
+**Limitations:**
 - Generated samples may be blurry (compared to GANs)
 - Assumes specific distributional form
 - KL divergence can be difficult to balance
