@@ -35,7 +35,7 @@ Modern machine learning models—from autoencoders to large language models—re
 
 ### What is a Latent Representation?
 
-A **latent representation** is a vector (or set of vectors) in a hidden space learned from data, which encodes the input in a way that makes downstream tasks easier. Formally, given a high-dimensional data point $\mathbf{x} \in \mathbb{R}^D$, we seek to learn a lower-dimensional representation $\mathbf{z} \in \mathbb{R}^d$ where $d \ll D$.
+A **latent representation** is a vector (or set of vectors) in a hidden space learned from data, which encodes the input in a way that makes downstream tasks easier. Formally, given a high-dimensional data point $$\mathbf{x} \in \mathbb{R}^D$$, we seek to learn a lower-dimensional representation $$\mathbf{z} \in \mathbb{R}^d$$ where $$d \ll D$$.
 
 ### Properties of Good Latent Spaces
 
@@ -71,25 +71,25 @@ An autoencoder is a neural network trained to reconstruct its input through a bo
 
 ### Mathematical Formulation
 
-Let our data be represented by $\mathbf{x} \in \mathbb{R}^D$, and the latent variable by $\mathbf{z} \in \mathbb{R}^d$, where $d \ll D$.
+Let our data be represented by $$\mathbf{x} \in \mathbb{R}^D$$, and the latent variable by $$\mathbf{z} \in \mathbb{R}^d$$, where $$d \ll D$$.
 
 A standard autoencoder consists of two components:
 
 #### Encoder
 
-The encoder learns a parametrized function $f_\phi: \mathbb{R}^D \rightarrow \mathbb{R}^d$ that maps high-dimensional input to a low-dimensional latent code:
+The encoder learns a parametrized function $$f_\phi: \mathbb{R}^D \rightarrow \mathbb{R}^d$$ that maps high-dimensional input to a low-dimensional latent code:
 
 $$\mathbf{z} = f_\phi(\mathbf{x})$$
 
-where $\phi$ represents the parameters of the encoder network.
+where $$\phi$$ represents the parameters of the encoder network.
 
 #### Decoder
 
-The decoder learns a parametrized function $g_\theta: \mathbb{R}^d \rightarrow \mathbb{R}^D$ that reconstructs the input from the latent code:
+The decoder learns a parametrized function $$g_\theta: \mathbb{R}^d \rightarrow \mathbb{R}^D$$ that reconstructs the input from the latent code:
 
 $$\hat{\mathbf{x}} = g_\theta(\mathbf{z}) = g_\theta(f_\phi(\mathbf{x}))$$
 
-where $\theta$ represents the parameters of the decoder network.
+where $$\theta$$ represents the parameters of the decoder network.
 
 ### Loss Function
 
@@ -100,8 +100,8 @@ $$
 $$
 
 Common choices for the reconstruction loss include:
-- **Mean Squared Error (MSE)**: $\| \mathbf{x} - \hat{\mathbf{x}} \|^2$ for continuous data
-- **Binary Cross-Entropy (BCE)**: $-\sum_i [x_i \log \hat{x}_i + (1-x_i) \log(1-\hat{x}_i)]$ for binary data
+- **Mean Squared Error (MSE)**: $$\| \mathbf{x} - \hat{\mathbf{x}} \|^2$$ for continuous data
+- **Binary Cross-Entropy (BCE)**: $$-\sum_i [x_i \log \hat{x}_i + (1-x_i) \log(1-\hat{x}_i)]$$ for binary data
 
 ![Autoencoder Architecture](https://via.placeholder.com/800x300/4a1a8a/ffffff?text=Autoencoder+Architecture)  
 *Figure 1: Autoencoder architecture showing the encoder-decoder structure with latent bottleneck*
@@ -112,17 +112,17 @@ The complete training objective is:
 
 $$\min_{\theta, \phi} \sum_{i=1}^{N} \| \mathbf{x}^{(i)} - g_\theta(f_\phi(\mathbf{x}^{(i)})) \|^2$$
 
-where $N$ is the number of training samples.
+where $$N$$ is the number of training samples.
 
 ### Limitations of Standard Autoencoders
 
 While autoencoders can learn useful representations, they have significant limitations:
 
-1. **Deterministic Mapping**: Each input $\mathbf{x}$ maps to a single, deterministic point $\mathbf{z}$ in the latent space.
+1. **Deterministic Mapping**: Each input $$\mathbf{x}$$ maps to a single, deterministic point $$\mathbf{z}$$ in the latent space.
 
 2. **Discontinuous Latent Space**: The latent space is typically **patchy** and **discontinuous**. Points that weren't explicitly seen during training may map to undefined or nonsensical regions.
 
-3. **No Generative Capability**: You cannot simply sample a random point $\mathbf{z}$ from the latent space and expect the decoder to produce a realistic sample. The decoder $g_\theta$ only works well for specific values of $\mathbf{z}$ that came from the encoder during training.
+3. **No Generative Capability**: You cannot simply sample a random point $$\mathbf{z}$$ from the latent space and expect the decoder to produce a realistic sample. The decoder $$g_\theta$$ only works well for specific values of $$\mathbf{z}$$ that came from the encoder during training.
 
 4. **No Probabilistic Interpretation**: Standard autoencoders lack a probabilistic framework, making it difficult to:
    - Quantify uncertainty
@@ -151,8 +151,8 @@ VAEs treat both the encoder and decoder as probabilistic models:
 
 The VAE assumes the following generative story for how data is created:
 
-1. Sample a latent code from a prior distribution: $\mathbf{z} \sim p(\mathbf{z})$
-2. Generate data from a conditional distribution: $\mathbf{x} \sim p_\theta(\mathbf{x}|\mathbf{z})$
+1. Sample a latent code from a prior distribution: $$\mathbf{z} \sim p(\mathbf{z})$$
+2. Generate data from a conditional distribution: $$\mathbf{x} \sim p_\theta(\mathbf{x}|\mathbf{z})$$
 
 The prior is typically chosen to be a standard Gaussian:
 
@@ -171,11 +171,11 @@ $$
 
 #### Inference Model (Encoder)
 
-The true posterior $p_\theta(\mathbf{z}|\mathbf{x})$ is intractable to compute directly. Instead, we introduce an **approximate posterior** (also called the **recognition model** or **inference network**):
+The true posterior $$p_\theta(\mathbf{z}|\mathbf{x})$$ is intractable to compute directly. Instead, we introduce an **approximate posterior** (also called the **recognition model** or **inference network**):
 
 $$q_\phi(\mathbf{z}|\mathbf{x}) = \mathcal{N}(\mathbf{z}; \boldsymbol{\mu}_\phi(\mathbf{x}), \boldsymbol{\sigma}_\phi^2(\mathbf{x})\mathbf{I})$$
 
-where the encoder network outputs the parameters $\boldsymbol{\mu}_\phi(\mathbf{x})$ and $\boldsymbol{\sigma}_\phi^2(\mathbf{x})$ of a Gaussian distribution.
+where the encoder network outputs the parameters $$\boldsymbol{\mu}_\phi(\mathbf{x})$$ and $$\boldsymbol{\sigma}_\phi^2(\mathbf{x})$$ of a Gaussian distribution.
 
 ### Goal: Maximum Likelihood Estimation
 
@@ -201,9 +201,9 @@ $$\log p_\theta(\mathbf{x}) = \log \int p_\theta(\mathbf{x}|\mathbf{z}) p(\mathb
 
 This integral is **intractable** for several reasons:
 
-1. **High Dimensionality**: If $\mathbf{z} \in \mathbb{R}^d$, we need to integrate over a $d$-dimensional space
-2. **Complex Decoder**: When $p_\theta(\mathbf{x}|\mathbf{z})$ is parameterized by a neural network, the integral has no closed form
-3. **Posterior Computation**: Computing $p_\theta(\mathbf{z}|\mathbf{x})$ requires knowing $p_\theta(\mathbf{x})$, creating a circular dependency
+1. **High Dimensionality**: If $$\mathbf{z} \in \mathbb{R}^d$$, we need to integrate over a $$d$$-dimensional space
+2. **Complex Decoder**: When $$p_\theta(\mathbf{x}|\mathbf{z})$$ is parameterized by a neural network, the integral has no closed form
+3. **Posterior Computation**: Computing $$p_\theta(\mathbf{z}|\mathbf{x})$$ requires knowing $$p_\theta(\mathbf{x})$$, creating a circular dependency
 
 The solution is to derive a lower bound on the log likelihood that is tractable to optimize. This is called the **Evidence Lower Bound (ELBO)**.
 
@@ -219,7 +219,7 @@ Starting with the log marginal likelihood:
 
 $$\log p_\theta(\mathbf{x}) = \log \int p_\theta(\mathbf{x}|\mathbf{z}) p(\mathbf{z}) d\mathbf{z}$$
 
-We multiply and divide by the approximate posterior $q_\phi(\mathbf{z}|\mathbf{x})$:
+We multiply and divide by the approximate posterior $$q_\phi(\mathbf{z}|\mathbf{x})$$:
 
 $$\log p_\theta(\mathbf{x}) = \log \int \frac{q_\phi(\mathbf{z}|\mathbf{x})}{q_\phi(\mathbf{z}|\mathbf{x})} p_\theta(\mathbf{x}|\mathbf{z}) p(\mathbf{z}) d\mathbf{z}$$
 
@@ -235,7 +235,7 @@ $$\log p_\theta(\mathbf{x}) = \log \mathbb{E}_{\mathbf{z} \sim q_\phi(\mathbf{z}
 
 ### Step 3: Apply Jensen's Inequality
 
-Jensen's inequality states that for a concave function $f$ (and $\log$ is concave):
+Jensen's inequality states that for a concave function $$f$$ (and $$\log$$ is concave):
 
 $$f(\mathbb{E}[X]) \geq \mathbb{E}[f(X)]$$
 
@@ -278,7 +278,7 @@ We begin with:
 
 $$\log p_\theta(\mathbf{x}) = \log p_\theta(\mathbf{x}) \int q_\phi(\mathbf{z}|\mathbf{x}) d\mathbf{z}$$
 
-This is valid because $\int q_\phi(\mathbf{z}|\mathbf{x}) d\mathbf{z} = 1$ (it's a probability distribution).
+This is valid because $$\int q_\phi(\mathbf{z}|\mathbf{x}) d\mathbf{z} = 1$$ (it's a probability distribution).
 
 ### Step 2: Move Inside the Integral
 
@@ -300,7 +300,7 @@ $$\log p_\theta(\mathbf{x}) = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\log p
 
 ### Step 5: Introduce the Approximate Posterior
 
-Multiply and divide by $q_\phi(\mathbf{z}|\mathbf{x})$:
+Multiply and divide by $$q_\phi(\mathbf{z}|\mathbf{x})$$:
 
 $$\log p_\theta(\mathbf{x}) = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} \left[ \log \frac{p_\theta(\mathbf{x}, \mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} \cdot \frac{q_\phi(\mathbf{z}|\mathbf{x})}{p_\theta(\mathbf{z}|\mathbf{x})} \right]$$
 
@@ -312,7 +312,7 @@ The first term is the **ELBO**:
 
 $$\mathcal{L}_{\theta,\phi}(\mathbf{x}) = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} \left[ \log \frac{p_\theta(\mathbf{x}, \mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} \right]$$
 
-The second term is the **KL divergence** between $q_\phi(\mathbf{z}|\mathbf{x})$ and $p_\theta(\mathbf{z}|\mathbf{x})$:
+The second term is the **KL divergence** between $$q_\phi(\mathbf{z}|\mathbf{x})$$ and $$p_\theta(\mathbf{z}|\mathbf{x})$$:
 
 $$D_{KL}(q_\phi(\mathbf{z}|\mathbf{x}) \| p_\theta(\mathbf{z}|\mathbf{x})) = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} \left[ \log \frac{q_\phi(\mathbf{z}|\mathbf{x})}{p_\theta(\mathbf{z}|\mathbf{x})} \right]$$
 
@@ -322,16 +322,16 @@ $$\boxed{\log p_\theta(\mathbf{x}) = \mathcal{L}_{\theta,\phi}(\mathbf{x}) + D_{
 
 ### Key Insights from This Derivation
 
-1. **The ELBO is a Lower Bound**: Since $D_{KL} \geq 0$ always:
+1. **The ELBO is a Lower Bound**: Since $$D_{KL} \geq 0$$ always:
    $$\mathcal{L}_{\theta,\phi}(\mathbf{x}) \leq \log p_\theta(\mathbf{x})$$
 
-2. **Tightness of the Bound**: The gap between the ELBO and the log likelihood is exactly the KL divergence. The better $q_\phi(\mathbf{z}|\mathbf{x})$ approximates the true posterior $p_\theta(\mathbf{z}|\mathbf{x})$, the tighter the bound.
+2. **Tightness of the Bound**: The gap between the ELBO and the log likelihood is exactly the KL divergence. The better $$q_\phi(\mathbf{z}|\mathbf{x})$$ approximates the true posterior $$p_\theta(\mathbf{z}|\mathbf{x})$$, the tighter the bound.
 
-3. **Joint Optimization**: Maximizing the ELBO w.r.t. $\phi$ minimizes the KL divergence, making $q_\phi$ a better approximation to the true posterior. Maximizing w.r.t. $\theta$ improves the model's ability to explain the data.
+3. **Joint Optimization**: Maximizing the ELBO w.r.t. $$\phi$$ minimizes the KL divergence, making $$q_\phi$$ a better approximation to the true posterior. Maximizing w.r.t. $$\theta$$ improves the model's ability to explain the data.
 
-4. **Why This Works**: We cannot compute $p_\theta(\mathbf{z}|\mathbf{x})$ directly, but we don't need to! By maximizing the ELBO, we simultaneously:
-   - Push up the log likelihood $\log p_\theta(\mathbf{x})$
-   - Make $q_\phi(\mathbf{z}|\mathbf{x})$ closer to $p_\theta(\mathbf{z}|\mathbf{x})$
+4. **Why This Works**: We cannot compute $$p_\theta(\mathbf{z}|\mathbf{x})$$ directly, but we don't need to! By maximizing the ELBO, we simultaneously:
+   - Push up the log likelihood $$\log p_\theta(\mathbf{x})$$
+   - Make $$q_\phi(\mathbf{z}|\mathbf{x})$$ closer to $$p_\theta(\mathbf{z}|\mathbf{x})$$
 
 ---
 
@@ -357,18 +357,18 @@ $$\boxed{\mathcal{L}_{\theta,\phi}(\mathbf{x}) = \mathbb{E}_{q_\phi(\mathbf{z}|\
 
 ### Interpretation
 
-**Reconstruction Term**: $\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\log p_\theta(\mathbf{x}|\mathbf{z})]$
+**Reconstruction Term**: $$\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\log p_\theta(\mathbf{x}|\mathbf{z})]$$
 - Measures how well the decoder reconstructs the input
-- Sample $\mathbf{z}$ from the encoder's distribution $q_\phi(\mathbf{z}|\mathbf{x})$
-- Evaluate how likely the decoder thinks the original $\mathbf{x}$ is given $\mathbf{z}$
+- Sample $$\mathbf{z}$$ from the encoder's distribution $$q_\phi(\mathbf{z}|\mathbf{x})$$
+- Evaluate how likely the decoder thinks the original $$\mathbf{x}$$ is given $$\mathbf{z}$$
 - Similar to the reconstruction loss in standard autoencoders
 - Encourages the latent code to contain information about the input
 
-**Regularization Term**: $D_{KL}(q_\phi(\mathbf{z}|\mathbf{x}) \| p(\mathbf{z}))$
+**Regularization Term**: $$D_{KL}(q_\phi(\mathbf{z}|\mathbf{x}) \| p(\mathbf{z}))$$
 - Measures how different the approximate posterior is from the prior
-- Regularizes the latent space to follow the prior distribution $p(\mathbf{z})$
+- Regularizes the latent space to follow the prior distribution $$p(\mathbf{z})$$
 - Prevents the encoder from cheating by encoding each input to an arbitrary region
-- Ensures that random samples from $p(\mathbf{z})$ can be decoded to realistic data
+- Ensures that random samples from $$p(\mathbf{z})$$ can be decoded to realistic data
 - Encourages the latent space to be smooth and continuous
 
 ### The Trade-off
@@ -391,7 +391,7 @@ The VAE training objective is to maximize the expected ELBO over the data distri
 
 $$\max_{\theta, \phi} \mathbb{E}_{\mathbf{x} \sim p_{data}(\mathbf{x})} [\mathcal{L}_{\theta,\phi}(\mathbf{x})]$$
 
-In practice, we work with a finite dataset $\{\mathbf{x}^{(1)}, \ldots, \mathbf{x}^{(N)}\}$ and use mini-batch gradient descent:
+In practice, we work with a finite dataset $$\{\mathbf{x}^{(1)}, \ldots, \mathbf{x}^{(N)}\}$$ and use mini-batch gradient descent:
 
 $$\max_{\theta, \phi} \frac{1}{N} \sum_{i=1}^{N} \mathcal{L}_{\theta,\phi}(\mathbf{x}^{(i)})$$
 
@@ -403,13 +403,13 @@ $$\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\log p_\theta(\mathbf{x}|\mathbf{z
 
 To estimate this expectation, we use Monte Carlo sampling:
 
-1. Sample $\mathbf{z} \sim q_\phi(\mathbf{z}|\mathbf{x})$
-2. Compute $\log p_\theta(\mathbf{x}|\mathbf{z})$
+1. Sample $$\mathbf{z} \sim q_\phi(\mathbf{z}|\mathbf{x})$$
+2. Compute $$\log p_\theta(\mathbf{x}|\mathbf{z})$$
 3. Average over multiple samples (often just 1 sample suffices)
 
 $$\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\log p_\theta(\mathbf{x}|\mathbf{z})] \approx \frac{1}{L} \sum_{l=1}^{L} \log p_\theta(\mathbf{x}|\mathbf{z}^{(l)})$$
 
-where $\mathbf{z}^{(l)} \sim q_\phi(\mathbf{z}|\mathbf{x})$.
+where $$\mathbf{z}^{(l)} \sim q_\phi(\mathbf{z}|\mathbf{x})$$.
 
 #### Gaussian Decoder
 
@@ -421,7 +421,7 @@ Then:
 
 $$\log p_\theta(\mathbf{x}|\mathbf{z}) = -\frac{D}{2} \log(2\pi\sigma^2) - \frac{1}{2\sigma^2} \|\mathbf{x} - \boldsymbol{\mu}_\theta(\mathbf{z})\|^2$$
 
-If we assume constant variance $\sigma^2$ or set it to 1, this reduces to minimizing the **mean squared error (MSE)**:
+If we assume constant variance $$\sigma^2$$ or set it to 1, this reduces to minimizing the **mean squared error (MSE)**:
 
 $$-\log p_\theta(\mathbf{x}|\mathbf{z}) \propto \|\mathbf{x} - \boldsymbol{\mu}_\theta(\mathbf{z})\|^2$$
 
@@ -431,7 +431,7 @@ For binary data (e.g., black and white images), we model each dimension independ
 
 $$p_\theta(\mathbf{x}|\mathbf{z}) = \prod_{i=1}^{D} \text{Bernoulli}(x_i; p_i)$$
 
-where $p_i = \boldsymbol{\mu}_\theta(\mathbf{z})_i$ (the decoder output after sigmoid activation).
+where $$p_i = \boldsymbol{\mu}_\theta(\mathbf{z})_i$$ (the decoder output after sigmoid activation).
 
 The log likelihood is:
 
@@ -451,7 +451,7 @@ With the choices:
 
 The KL divergence between two multivariate Gaussians has a **closed-form solution**:
 
-For $q = \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma})$ and $p = \mathcal{N}(\mathbf{0}, \mathbf{I})$, where $\boldsymbol{\Sigma}$ is diagonal:
+For $$q = \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma})$$ and $$p = \mathcal{N}(\mathbf{0}, \mathbf{I})$$, where $$\boldsymbol{\Sigma}$$ is diagonal:
 
 $$D_{KL}(q \| p) = \frac{1}{2} \sum_{j=1}^{d} \left( \mu_j^2 + \sigma_j^2 - \log(\sigma_j^2) - 1 \right)$$
 
@@ -461,11 +461,11 @@ The KL divergence between two distributions is:
 
 $$D_{KL}(q \| p) = \mathbb{E}_{q} \left[ \log \frac{q(\mathbf{z})}{p(\mathbf{z})} \right] = \mathbb{E}_{q} [\log q(\mathbf{z})] - \mathbb{E}_{q} [\log p(\mathbf{z})]$$
 
-For $q = \mathcal{N}(\boldsymbol{\mu}, \text{diag}(\boldsymbol{\sigma}^2))$:
+For $$q = \mathcal{N}(\boldsymbol{\mu}, \text{diag}(\boldsymbol{\sigma}^2))$$:
 
 $$\log q(\mathbf{z}) = -\frac{d}{2} \log(2\pi) - \frac{1}{2} \sum_{j=1}^{d} \log \sigma_j^2 - \frac{1}{2} \sum_{j=1}^{d} \frac{(z_j - \mu_j)^2}{\sigma_j^2}$$
 
-For $p = \mathcal{N}(\mathbf{0}, \mathbf{I})$:
+For $$p = \mathcal{N}(\mathbf{0}, \mathbf{I})$$:
 
 $$\log p(\mathbf{z}) = -\frac{d}{2} \log(2\pi) - \frac{1}{2} \sum_{j=1}^{d} z_j^2$$
 
@@ -489,11 +489,11 @@ $$\mathcal{L}_{VAE}(\mathbf{x}) = -\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\
 
 Note the sign change: we typically minimize loss rather than maximize the ELBO.
 
-In practice, for a mini-batch of size $M$:
+In practice, for a mini-batch of size $$M$$:
 
 $$\mathcal{L}_{VAE} = \frac{1}{M} \sum_{i=1}^{M} \left[ \underbrace{\|\mathbf{x}^{(i)} - \text{Decoder}(\mathbf{z}^{(i)})\|^2}_{\text{Reconstruction Loss}} + \underbrace{\frac{1}{2} \sum_{j=1}^{d} (\mu_j^2 + \sigma_j^2 - \log \sigma_j^2 - 1)}_{\text{KL Divergence}} \right]$$
 
-where $\mathbf{z}^{(i)} \sim \mathcal{N}(\boldsymbol{\mu}_\phi(\mathbf{x}^{(i)}), \boldsymbol{\sigma}_\phi^2(\mathbf{x}^{(i)})\mathbf{I})$.
+where $$\mathbf{z}^{(i)} \sim \mathcal{N}(\boldsymbol{\mu}_\phi(\mathbf{x}^{(i)}), \boldsymbol{\sigma}_\phi^2(\mathbf{x}^{(i)})\mathbf{I})$$.
 
 ---
 
@@ -503,11 +503,11 @@ There's a critical problem with the loss function as stated: **how do we backpro
 
 ### The Problem
 
-The encoder outputs $\boldsymbol{\mu}_\phi(\mathbf{x})$ and $\boldsymbol{\sigma}_\phi(\mathbf{x})$, and we need to sample:
+The encoder outputs $$\boldsymbol{\mu}_\phi(\mathbf{x})$$ and $$\boldsymbol{\sigma}_\phi(\mathbf{x})$$, and we need to sample:
 
 $$\mathbf{z} \sim \mathcal{N}(\boldsymbol{\mu}_\phi(\mathbf{x}), \boldsymbol{\sigma}_\phi^2(\mathbf{x})\mathbf{I})$$
 
-Then we pass $\mathbf{z}$ to the decoder. The problem is: **sampling is not differentiable**. We cannot compute gradients through a random operation.
+Then we pass $$\mathbf{z}$$ to the decoder. The problem is: **sampling is not differentiable**. We cannot compute gradients through a random operation.
 
 ### Naive Approach (Doesn't Work)
 
@@ -519,7 +519,7 @@ we encounter:
 
 $$\frac{\partial \mathcal{L}}{\partial \phi} = \frac{\partial \mathcal{L}}{\partial \mathbf{z}} \frac{\partial \mathbf{z}}{\partial \phi}$$
 
-But $\mathbf{z}$ is sampled randomly, so $\frac{\partial \mathbf{z}}{\partial \phi}$ is undefined!
+But $$\mathbf{z}$$ is sampled randomly, so $$\frac{\partial \mathbf{z}}{\partial \phi}$$ is undefined!
 
 ### The Reparameterization Trick
 
@@ -529,23 +529,23 @@ Instead of sampling:
 $$\mathbf{z} \sim \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\sigma}^2\mathbf{I})$$
 
 We rewrite it as:
-1. Sample $\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$  (pure randomness, independent of parameters)
-2. Transform: $\mathbf{z} = \boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon}$  (deterministic transformation)
+1. Sample $$\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$$  (pure randomness, independent of parameters)
+2. Transform: $$\mathbf{z} = \boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon}$$  (deterministic transformation)
 
-where $\odot$ denotes element-wise multiplication.
+where $$\odot$$ denotes element-wise multiplication.
 
 ### Why This Works
 
-**Mathematically**: The reparameterization is valid because if $\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$, then $\boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon} \sim \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\sigma}^2\mathbf{I})$. This is a property of Gaussian distributions:
+**Mathematically**: The reparameterization is valid because if $$\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$$, then $$\boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon} \sim \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\sigma}^2\mathbf{I})$$. This is a property of Gaussian distributions:
 
-- $\mathbb{E}[\mathbf{z}] = \mathbb{E}[\boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon}] = \boldsymbol{\mu} + \boldsymbol{\sigma} \odot \mathbb{E}[\boldsymbol{\epsilon}] = \boldsymbol{\mu}$
-- $\text{Var}[\mathbf{z}] = \text{Var}[\boldsymbol{\sigma} \odot \boldsymbol{\epsilon}] = \boldsymbol{\sigma}^2 \odot \text{Var}[\boldsymbol{\epsilon}] = \boldsymbol{\sigma}^2$
+- $$\mathbb{E}[\mathbf{z}] = \mathbb{E}[\boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon}] = \boldsymbol{\mu} + \boldsymbol{\sigma} \odot \mathbb{E}[\boldsymbol{\epsilon}] = \boldsymbol{\mu}$$
+- $$\text{Var}[\mathbf{z}] = \text{Var}[\boldsymbol{\sigma} \odot \boldsymbol{\epsilon}] = \boldsymbol{\sigma}^2 \odot \text{Var}[\boldsymbol{\epsilon}] = \boldsymbol{\sigma}^2$$
 
-**Computationally**: Now the randomness comes from $\boldsymbol{\epsilon}$, which is independent of $\phi$ and $\theta$. The transformation $\mathbf{z} = \boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon}$ is fully differentiable:
+**Computationally**: Now the randomness comes from $$\boldsymbol{\epsilon}$$, which is independent of $$\phi$$ and $$\theta$$. The transformation $$\mathbf{z} = \boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon}$$ is fully differentiable:
 
 $$\frac{\partial \mathbf{z}}{\partial \boldsymbol{\mu}} = \mathbf{I}, \quad \frac{\partial \mathbf{z}}{\partial \boldsymbol{\sigma}} = \text{diag}(\boldsymbol{\epsilon})$$
 
-Gradients can now flow through $\boldsymbol{\mu}$ and $\boldsymbol{\sigma}$ to the encoder parameters $\phi$.
+Gradients can now flow through $$\boldsymbol{\mu}$$ and $$\boldsymbol{\sigma}$$ to the encoder parameters $$\phi$$.
 
 ### Implementation
 
@@ -601,11 +601,11 @@ The path from encoder parameters to the loss goes through **mu** and **std**, wh
 
 **Input:** Dataset $\mathcal{D} = \{\mathbf{x}^{(1)}, \ldots, \mathbf{x}^{(N)}\}$, batch size $M$, learning rate $\alpha$
 
-**Initialize:** Encoder parameters $\phi$, decoder parameters $\theta$
+**Initialize:** Encoder parameters $$\phi$$, decoder parameters $$\theta$$
 
 **Repeat until convergence:**
 
-1. Sample a mini-batch $\{\mathbf{x}^{(i)}\}_{i=1}^{M}$ from $\mathcal{D}$
+1. Sample a mini-batch $$\{\mathbf{x}^{(i)}\}_{i=1}^{M}$$ from $$\mathcal{D}$$
 
 2. **Forward pass:**
    - For each $\mathbf{x}^{(i)}$ in the mini-batch:
@@ -640,9 +640,9 @@ The path from encoder parameters to the loss goes through **mu** and **std**, wh
 4. **Beta-VAE**: Add a weight $\beta$ to the KL term:
    $$\mathcal{L}_{\beta-VAE} = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\log p_\theta(\mathbf{x}|\mathbf{z})] - \beta \cdot D_{KL}(q_\phi(\mathbf{z}|\mathbf{x}) \| p(\mathbf{z}))$$
    
-   - $\beta < 1$: Prioritize reconstruction
-   - $\beta > 1$: Encourage disentangled representations
-   - $\beta = 1$: Standard VAE
+   - $$\beta < 1$$: Prioritize reconstruction
+   - $$\beta > 1$$: Encourage disentangled representations
+   - $$\beta = 1$$: Standard VAE
 
 5. **KL Annealing**: Gradually increase the weight of the KL term from 0 to 1 during training to prevent "posterior collapse"
 
@@ -800,10 +800,10 @@ After training, the VAE can accurately reconstruct input images. The reconstruct
 With a 2D latent space, we can visualize the learned manifold:
 
 **Scatter Plot of Encoded Digits:**
-- Each point represents a digit encoded to $\mathbf{z} \in \mathbb{R}^2$
+- Each point represents a digit encoded to $$\mathbf{z} \in \mathbb{R}^2$$
 - Different digits form distinct clusters
 - Similar digits (like 4 and 9) are closer together
-- The distribution approximately follows $\mathcal{N}(\mathbf{0}, \mathbf{I})$ due to the KL regularization
+- The distribution approximately follows $$\mathcal{N}(\mathbf{0}, \mathbf{I})$$ due to the KL regularization
 
 **Latent Space Traversal:**
 - Sample a grid of points from the 2D latent space
@@ -812,7 +812,7 @@ With a 2D latent space, we can visualize the learned manifold:
 
 #### 3. Generation
 
-Sample $\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ and decode:
+Sample $$\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$$ and decode:
 
 $$\hat{\mathbf{x}} = \text{Decoder}_\theta(\mathbf{z})$$
 
@@ -823,11 +823,11 @@ The generated images are:
 
 #### 4. Interpolation
 
-Given two images $\mathbf{x}_1$ and $\mathbf{x}_2$:
+Given two images $$\mathbf{x}_1$$ and $$\mathbf{x}_2$$:
 
-1. Encode to latent: $\mathbf{z}_1 = \boldsymbol{\mu}_\phi(\mathbf{x}_1)$, $\mathbf{z}_2 = \boldsymbol{\mu}_\phi(\mathbf{x}_2)$
-2. Interpolate: $\mathbf{z}_t = (1-t) \mathbf{z}_1 + t \mathbf{z}_2$ for $t \in [0, 1]$
-3. Decode: $\hat{\mathbf{x}}_t = \text{Decoder}_\theta(\mathbf{z}_t)$
+1. Encode to latent: $$\mathbf{z}_1 = \boldsymbol{\mu}_\phi(\mathbf{x}_1)$$, $$\mathbf{z}_2 = \boldsymbol{\mu}_\phi(\mathbf{x}_2)$$
+2. Interpolate: $$\mathbf{z}_t = (1-t) \mathbf{z}_1 + t \mathbf{z}_2$$ for $$t \in [0, 1]$$
+3. Decode: $$\hat{\mathbf{x}}_t = \text{Decoder}_\theta(\mathbf{z}_t)$$
 
 Result: A smooth morphing from one digit to another, demonstrating the continuity of the latent space.
 
@@ -840,7 +840,7 @@ Let's highlight the key differences experimentally.
 ### Standard Autoencoder
 
 **Architecture:** Same encoder/decoder structure, but:
-- Encoder outputs a single vector $\mathbf{z}$ (not $\boldsymbol{\mu}$ and $\boldsymbol{\sigma}$)
+- Encoder outputs a single vector $$\mathbf{z}$$ (not $$\boldsymbol{\mu}$$ and $$\boldsymbol{\sigma}$$)
 - No reparameterization
 - No KL divergence term
 
@@ -869,9 +869,9 @@ $$\mathcal{L}_{AE} = \|\mathbf{x} - \text{Decoder}(\text{Encoder}(\mathbf{x}))\|
 
 #### Generation Quality
 
-**AE**: Sampling random $\mathbf{z}$ often produces blurry or unrealistic images, because most regions of latent space are "unmapped."
+**AE**: Sampling random $$\mathbf{z}$$ often produces blurry or unrealistic images, because most regions of latent space are "unmapped."
 
-**VAE**: Sampling $\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ consistently produces recognizable digits.
+**VAE**: Sampling $$\mathbf{z} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$$ consistently produces recognizable digits.
 
 #### Reconstruction Fidelity
 
@@ -937,7 +937,7 @@ Despite their elegance, VAEs have some limitations:
 
 Modern research has developed many VAE variants:
 
-- **$\beta$-VAE**: Disentangled representations via $\beta > 1$
+- **$$\beta$$-VAE**: Disentangled representations via $$\beta > 1$$
 - **VQ-VAE**: Discrete latent spaces using vector quantization
 - **Hierarchical VAEs**: Multiple layers of latent variables
 - **Conditional VAEs**: Condition on labels or other information
