@@ -156,15 +156,15 @@ The VAE assumes the following generative story for how data is created:
 
 The prior is typically chosen to be a standard Gaussian:
 
-$$
+$
 p(\mathbf{z}) = \mathcal{N}(\mathbf{z}; \mathbf{0}, \mathbf{I})
-$$
+$
 
-The decoder network parameterizes \(p_\theta(\mathbf{x}|\mathbf{z})\), often as:
+The decoder network parameterizes $p_\theta(\mathbf{x}|\mathbf{z})$ , often as:
 
-$$
+$
 p_\theta(\mathbf{x}|\mathbf{z}) = \mathcal{N}(\mathbf{x}; \boldsymbol{\mu}_\theta(\mathbf{z}), \boldsymbol{\sigma}_\theta^2(\mathbf{z})\mathbf{I})
-$$
+$
 
 ![VAE Architecture](https://via.placeholder.com/900x400/6c5ce7/ffffff?text=VAE+Architecture+with+Reparameterization)  
 *Figure 2: Variational Autoencoder architecture showing the probabilistic encoder and decoder*
