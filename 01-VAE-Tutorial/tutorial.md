@@ -160,7 +160,7 @@ $$
 p(\mathbf{z}) = \mathcal{N}(\mathbf{z}; \mathbf{0}, \mathbf{I})
 $$
 
-The decoder network parameterizes $p_\theta(\mathbf{x}|\mathbf{z})$, often as:
+The decoder network parameterizes \(p_\theta(\mathbf{x}|\mathbf{z})\), often as:
 
 $$
 p_\theta(\mathbf{x}|\mathbf{z}) = \mathcal{N}(\mathbf{x}; \boldsymbol{\mu}_\theta(\mathbf{z}), \boldsymbol{\sigma}_\theta^2(\mathbf{z})\mathbf{I})
