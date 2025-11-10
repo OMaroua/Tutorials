@@ -17,16 +17,19 @@
                 displayMath: [['$$', '$$'], ['\\[', '\\]']],
                 processEscapes: true,
                 processEnvironments: true,
-                tags: 'ams',
-                packages: {'[+]': ['noerrors']}
+                tags: 'ams'
             },
             options: {
-                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-                ignoreHtmlClass: 'tex2jax_ignore',
-                processHtmlClass: 'tex2jax_process'
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
             },
-            loader: {
-                load: ['[tex]/noerrors']
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    MathJax.startup.promise.then(() => {
+                        // Force typeset after page load
+                        MathJax.typesetPromise();
+                    });
+                }
             },
             svg: {
                 fontCache: 'global'
@@ -34,7 +37,7 @@
         };
     </script>
     <script type="text/javascript" id="MathJax-script" async
-        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
     </script>
     
     <!-- Syntax highlighting -->
