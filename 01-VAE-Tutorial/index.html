@@ -136,29 +136,98 @@
             </div>
 
             <div class="content-card">
-                <h3>Loss Function</h3>
-                <p>The VAE optimizes two objectives simultaneously:</p>
+                <h3>Complete Loss Function Derivation</h3>
+                
+                <h4>Step 1: KL Divergence for Gaussians</h4>
+                <p>We need to compute \(D_{KL}(q_\phi(z|x) \| p(z))\) where:</p>
+                <ul>
+                    <li>\(q_\phi(z|x) = \mathcal{N}(\mu, \text{diag}(\sigma^2))\) (approximate posterior)</li>
+                    <li>\(p(z) = \mathcal{N}(0, I)\) (prior)</li>
+                </ul>
+                
                 <div class="math-block">
-                    \[\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{reconstruction}} + \beta \cdot \mathcal{L}_{\text{KL}}\]
+                    \[D_{KL}(q_\phi(z|x) \| p(z)) = \int q_\phi(z|x) \log \frac{q_\phi(z|x)}{p(z)} dz\]
+                </div>
+                
+                <p><strong>Write out Gaussian PDFs:</strong></p>
+                <div class="math-block">
+                    \[\log q_\phi(z|x) = -\frac{k}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^{k}\log(\sigma_i^2) - \frac{1}{2}\sum_{i=1}^{k}\frac{(z_i-\mu_i)^2}{\sigma_i^2}\]
+                </div>
+                <div class="math-block">
+                    \[\log p(z) = -\frac{k}{2}\log(2\pi) - \frac{1}{2}\sum_{i=1}^{k}z_i^2\]
+                </div>
+                
+                <p><strong>Take expectation w.r.t. \(q_\phi(z|x)\):</strong></p>
+                <ul>
+                    <li>Term 1: \(\mathbb{E}[-\frac{1}{2}\sum_{i}\log(\sigma_i^2)] = -\frac{1}{2}\sum_{i}\log(\sigma_i^2)\)</li>
+                    <li>Term 2: \(\mathbb{E}[-\frac{1}{2}\sum_{i}\frac{(z_i-\mu_i)^2}{\sigma_i^2}] = -\frac{k}{2}\)</li>
+                    <li>Term 3: \(\mathbb{E}[\frac{1}{2}\sum_{i}z_i^2] = \frac{1}{2}\sum_{i}(\sigma_i^2 + \mu_i^2)\)</li>
+                </ul>
+                
+                <p><strong>Final closed-form KL divergence:</strong></p>
+                <div class="math-block">
+                    \[D_{KL} = \frac{1}{2}\sum_{i=1}^{k}\left(\mu_i^2 + \sigma_i^2 - \log(\sigma_i^2) - 1\right)\]
+                </div>
+                
+                <h4>Step 2: Reconstruction Loss</h4>
+                
+                <p><strong>For Binary Data (MNIST):</strong></p>
+                <p>Assume each pixel is independent Bernoulli:</p>
+                <div class="math-block">
+                    \[p_\theta(x|z) = \prod_{i=1}^{D} \hat{x}_i^{x_i}(1-\hat{x}_i)^{1-x_i}\]
+                </div>
+                <p>Taking the log:</p>
+                <div class="math-block">
+                    \[\log p_\theta(x|z) = \sum_{i=1}^{D}\left[x_i \log \hat{x}_i + (1-x_i)\log(1-\hat{x}_i)\right]\]
+                </div>
+                <p>Therefore, reconstruction loss is <strong>binary cross-entropy</strong>:</p>
+                <div class="math-block">
+                    \[\mathcal{L}_{\text{reconstruction}} = -\sum_{i=1}^{D}\left[x_i \log \hat{x}_i + (1-x_i)\log(1-\hat{x}_i)\right]\]
+                </div>
+                
+                <p><strong>For Continuous Data:</strong></p>
+                <p>Assume Gaussian likelihood \(p_\theta(x|z) = \mathcal{N}(x; g_\theta(z), \sigma^2I)\):</p>
+                <div class="math-block">
+                    \[\log p_\theta(x|z) = -\frac{D}{2}\log(2\pi\sigma^2) - \frac{1}{2\sigma^2}\|x - g_\theta(z)\|^2\]
+                </div>
+                <p>Ignoring constants, this gives <strong>MSE</strong>:</p>
+                <div class="math-block">
+                    \[\mathcal{L}_{\text{reconstruction}} \propto \|x - g_\theta(z)\|^2\]
+                </div>
+                
+                <h4>Step 3: Complete VAE Loss</h4>
+                
+                <p><strong>Final training objective (negative ELBO):</strong></p>
+                <div class="math-block" style="border: 3px solid var(--primary-color); padding: 1.5rem;">
+                    \[\boxed{\mathcal{L}_{VAE}(x) = \frac{1}{D}\|x - g_\theta(z)\|_2^2 + \frac{1}{2d} \sum_{j=1}^{d} \left(\mu_j^2 + \sigma_j^2 - \log(\sigma_j^2) - 1\right)}\]
+                </div>
+                
+                <p class="caption">where \(z = \mu_\phi(x) + \sigma_\phi(x) \odot \epsilon\) with \(\epsilon \sim \mathcal{N}(0, I)\)</p>
+                
+                <div class="info-box info-box-green">
+                    <h4>Implementation Note</h4>
+                    <p>In code, work with \(\log(\sigma^2)\) for numerical stability:</p>
+                    <pre style="background: #1e1e1e; padding: 1rem; border-radius: 4px; overflow-x: auto;"><code style="color: #d4d4d4;">z_mean = encoder_mean(x)
+z_log_var = encoder_log_var(x)  # log(σ²) not σ²
+
+# KL loss
+kl_loss = -0.5 * sum(1 + z_log_var - z_mean² - exp(z_log_var))
+
+# Reparameterization
+z = z_mean + exp(0.5 * z_log_var) * epsilon</code></pre>
                 </div>
                 
                 <div class="grid-2">
                     <div class="loss-card">
-                        <h4>Reconstruction Loss</h4>
-                        <p>Ensures the output matches the input</p>
+                        <h4>Reconstruction Term</h4>
+                        <p>Ensures output fidelity</p>
                         <p class="small-text">Binary cross-entropy or MSE</p>
                     </div>
                     <div class="loss-card">
-                        <h4>KL Divergence</h4>
-                        <p>Regularizes latent space to match prior</p>
-                        <div class="math-small">
-                            \[\frac{1}{2} \sum_{i} (1 + \log(\sigma_i^2) - \mu_i^2 - \sigma_i^2)\]
-                        </div>
+                        <h4>KL Divergence Term</h4>
+                        <p>Regularizes latent space</p>
+                        <p class="small-text">Closed-form for Gaussians</p>
                     </div>
-                </div>
-
-                <div class="info-box info-box-yellow">
-                    <strong>Intuition:</strong> The reconstruction loss makes the VAE an autoencoder, while KL divergence makes it <em>variational</em> by ensuring the latent space has nice properties for generation.
                 </div>
             </div>
         </section>
