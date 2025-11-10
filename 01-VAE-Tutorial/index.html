@@ -21,7 +21,6 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
-                <span class="nav-icon">🧠</span>
                 <span>VAE Tutorial</span>
             </div>
             <ul class="nav-menu">
@@ -56,7 +55,7 @@
         <!-- Table of Contents -->
         <section class="toc-section">
             <div class="toc-card">
-                <h2>📚 Table of Contents</h2>
+                <h2>Table of Contents</h2>
                 <ol class="toc-list">
                     <li><a href="#introduction">Introduction</a></li>
                     <li><a href="#what-is-vae">What is a VAE?</a></li>
@@ -73,7 +72,7 @@
 
         <!-- Introduction -->
         <section id="introduction" class="content-section">
-            <h2 class="section-title">🎯 Introduction</h2>
+            <h2 class="section-title">Introduction</h2>
             <div class="content-card">
                 <p class="lead">
                     A <strong>Variational Autoencoder (VAE)</strong> is a powerful generative model that learns to encode input data into a low-dimensional probabilistic latent space and reconstruct it back to the original form. 
@@ -85,10 +84,10 @@
                 <div class="info-box info-box-blue">
                     <h3>Why VAEs Matter</h3>
                     <ul>
-                        <li>✨ <strong>Generation</strong>: Create new, realistic samples by sampling from latent space</li>
-                        <li>🔄 <strong>Interpolation</strong>: Smooth transitions between data points</li>
-                        <li>📊 <strong>Representation Learning</strong>: Discover meaningful low-dimensional structure</li>
-                        <li>🎲 <strong>Probabilistic Framework</strong>: Principled uncertainty quantification</li>
+                        <li><strong>Generation</strong>: Create new, realistic samples by sampling from latent space</li>
+                        <li><strong>Interpolation</strong>: Smooth transitions between data points</li>
+                        <li><strong>Representation Learning</strong>: Discover meaningful low-dimensional structure</li>
+                        <li><strong>Probabilistic Framework</strong>: Principled uncertainty quantification</li>
                     </ul>
                 </div>
 
@@ -100,25 +99,22 @@
 
         <!-- What is a VAE -->
         <section id="what-is-vae" class="content-section">
-            <h2 class="section-title">🧠 What is a VAE?</h2>
+            <h2 class="section-title">What is a VAE?</h2>
             
             <div class="content-card">
                 <h3>Core Components</h3>
                 <div class="grid-3">
                     <div class="component-card">
-                        <div class="component-icon">📥</div>
                         <h4>Encoder</h4>
                         <p>Compresses input \(x\) into latent variables \(z\)</p>
                         <p class="math-inline">\(q(z|x) = \mathcal{N}(\mu, \sigma^2)\)</p>
                     </div>
                     <div class="component-card">
-                        <div class="component-icon">🎲</div>
                         <h4>Latent Space</h4>
                         <p>Probabilistic representation</p>
                         <p class="math-inline">\(p(z) = \mathcal{N}(0, I)\)</p>
                     </div>
                     <div class="component-card">
-                        <div class="component-icon">📤</div>
                         <h4>Decoder</h4>
                         <p>Reconstructs from latent samples</p>
                         <p class="math-inline">\(p(x|z)\)</p>
@@ -148,12 +144,12 @@
                 
                 <div class="grid-2">
                     <div class="loss-card">
-                        <h4>🎯 Reconstruction Loss</h4>
+                        <h4>Reconstruction Loss</h4>
                         <p>Ensures the output matches the input</p>
                         <p class="small-text">Binary cross-entropy or MSE</p>
                     </div>
                     <div class="loss-card">
-                        <h4>📐 KL Divergence</h4>
+                        <h4>KL Divergence</h4>
                         <p>Regularizes latent space to match prior</p>
                         <div class="math-small">
                             \[\frac{1}{2} \sum_{i} (1 + \log(\sigma_i^2) - \mu_i^2 - \sigma_i^2)\]
@@ -162,14 +158,14 @@
                 </div>
 
                 <div class="info-box info-box-yellow">
-                    <strong>💡 Intuition:</strong> The reconstruction loss makes the VAE an autoencoder, while KL divergence makes it <em>variational</em> by ensuring the latent space has nice properties for generation.
+                    <strong>Intuition:</strong> The reconstruction loss makes the VAE an autoencoder, while KL divergence makes it <em>variational</em> by ensuring the latent space has nice properties for generation.
                 </div>
             </div>
         </section>
 
         <!-- Architecture -->
         <section id="architecture" class="content-section">
-            <h2 class="section-title">🏗️ Model Architecture</h2>
+            <h2 class="section-title">Model Architecture</h2>
             
             <div class="content-card">
                 <h3>2D VAE Architecture</h3>
@@ -239,7 +235,7 @@
 
         <!-- 2D Experiments -->
         <section id="2d-experiments" class="content-section">
-            <h2 class="section-title">🎨 2D Latent Space Experiments</h2>
+            <h2 class="section-title">2D Latent Space Experiments</h2>
             
             <div class="content-card">
                 <h3>Objective</h3>
@@ -281,10 +277,10 @@
                 <div class="observations">
                     <h4>Key Observations</h4>
                     <ul>
-                        <li>✅ Smooth transitions between different digit classes</li>
-                        <li>✅ Continuous manifold structure without discontinuities</li>
-                        <li>✅ Neighboring points produce visually similar digits</li>
-                        <li>✅ Edge regions show interesting interpolations between classes</li>
+                        <li>Smooth transitions between different digit classes</li>
+                        <li>Continuous manifold structure without discontinuities</li>
+                        <li>Neighboring points produce visually similar digits</li>
+                        <li>Edge regions show interesting interpolations between classes</li>
                     </ul>
                 </div>
             </div>
@@ -304,10 +300,10 @@
                 <div class="observations">
                     <h4>Key Observations</h4>
                     <ul>
-                        <li>✅ Each digit class forms distinct clusters</li>
-                        <li>✅ Similar digits (e.g., 3 and 8, 4 and 9) positioned near each other</li>
-                        <li>✅ Some overlap indicates visual similarity</li>
-                        <li>✅ Encoder learned meaningful semantic relationships</li>
+                        <li>Each digit class forms distinct clusters</li>
+                        <li>Similar digits (e.g., 3 and 8, 4 and 9) positioned near each other</li>
+                        <li>Some overlap indicates visual similarity</li>
+                        <li>Encoder learned meaningful semantic relationships</li>
                     </ul>
                 </div>
             </div>
@@ -315,7 +311,7 @@
 
         <!-- 3D Extension -->
         <section id="3d-extension" class="content-section">
-            <h2 class="section-title">📦 3D Latent Space Extension</h2>
+            <h2 class="section-title">3D Latent Space Extension</h2>
             
             <div class="content-card">
                 <h3>Motivation</h3>
@@ -421,7 +417,7 @@ latent_dim = 3  # Changed from 2
 
         <!-- Covariance -->
         <section id="covariance" class="content-section">
-            <h2 class="section-title">🔄 Non-Equal Covariance Prior</h2>
+            <h2 class="section-title">Non-Equal Covariance Prior</h2>
             
             <div class="content-card">
                 <h3>Motivation</h3>
@@ -499,7 +495,7 @@ z = z_mean + tf.matmul(epsilon, L.T)</code></pre>
 
         <!-- Implementation -->
         <section id="implementation" class="content-section">
-            <h2 class="section-title">💻 Implementation Guide</h2>
+            <h2 class="section-title">Implementation Guide</h2>
             
             <div class="content-card">
                 <h3>Prerequisites</h3>
@@ -623,7 +619,7 @@ plt.show()</code></pre>
 
         <!-- Results -->
         <section id="results" class="content-section">
-            <h2 class="section-title">📊 Results & Visualizations</h2>
+            <h2 class="section-title">Results & Visualizations</h2>
             
             <div class="content-card">
                 <h3>Summary Table</h3>
@@ -740,7 +736,7 @@ plt.show()</code></pre>
 
         <!-- References -->
         <section id="references" class="content-section">
-            <h2 class="section-title">🔗 References</h2>
+            <h2 class="section-title">References</h2>
             
             <div class="content-card">
                 <h3>Papers</h3>

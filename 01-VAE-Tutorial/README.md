@@ -7,7 +7,7 @@
 
 ---
 
-## 📚 Table of Contents
+## Table of Contents
 
 1. [Introduction](#introduction)
 2. [What is a VAE?](#what-is-a-vae)
@@ -21,7 +21,7 @@
 
 ---
 
-## 🎯 Introduction
+## Introduction
 
 A **Variational Autoencoder (VAE)** is a powerful generative model that learns to encode input data into a low-dimensional probabilistic latent space and reconstruct it back to the original form. Unlike standard autoencoders that map each input deterministically to a latent vector, VAEs learn a *distribution* over the latent variables.
 
@@ -35,7 +35,7 @@ In this tutorial, we'll explore VAEs through experiments on the **MNIST** datase
 
 ---
 
-## 🧠 What is a VAE?
+## What is a VAE?
 
 ### Key Concepts
 
@@ -74,7 +74,7 @@ $$\mathcal{L}_{\text{KL}} = D_{KL}(q(z|x) \| p(z)) = \frac{1}{2} \sum_{i=1}^{k} 
 
 ---
 
-## 🏗️ Model Architecture
+## Model Architecture
 
 ### 2D VAE Architecture
 
@@ -110,7 +110,7 @@ Output: 28×28 reconstructed image
 
 ---
 
-## 🎨 2D Latent Space Experiments
+## 2D Latent Space Experiments
 
 ### Objective
 
@@ -152,7 +152,7 @@ Plotting the latent encodings of test samples reveals natural clustering:
 
 ---
 
-## 📦 3D Latent Space Extension
+## 3D Latent Space Extension
 
 ### Motivation
 
@@ -211,7 +211,7 @@ By fixing $z_2$ and varying $(z_0, z_1)$, we can slice through the 3D manifold:
 
 ---
 
-## 🔄 Non-Equal Covariance Prior
+## Non-Equal Covariance Prior
 
 ### Motivation
 
@@ -269,7 +269,7 @@ Introducing correlation adds flexibility by allowing latent dimensions to captur
 
 ---
 
-## 💻 Implementation Guide
+## Implementation Guide
 
 ### Prerequisites
 
@@ -389,7 +389,7 @@ plt.show()
 
 ---
 
-## 📊 Results & Visualizations
+## Results & Visualizations
 
 ### Summary Table
 
@@ -421,7 +421,7 @@ plt.show()
 
 ---
 
-## 🎓 Key Takeaways
+## Key Takeaways
 
 ### What We Learned
 
@@ -448,7 +448,7 @@ plt.show()
 
 ---
 
-## 🔗 References
+## References
 
 ### Papers
 - [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114) - Kingma & Welling (2013)
@@ -464,13 +464,13 @@ plt.show()
 
 ---
 
-## 📝 License
+## License
 
 MIT License - Feel free to use this tutorial for educational purposes.
 
 ---
 
-## 👤 Author
+## Author
 
 **Maroua Oukrid**
 
