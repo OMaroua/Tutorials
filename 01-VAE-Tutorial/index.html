@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An interactive guide to understanding Variational Autoencoders through hands-on experiments">
+    <title>VAE Tutorial — Understanding Latent Space</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- MathJax for mathematical formulas -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <!-- Syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="nav-icon">🧠</span>
+                <span>VAE Tutorial</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#introduction">Intro</a></li>
+                <li><a href="#what-is-vae">Concepts</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#2d-experiments">2D Space</a></li>
+                <li><a href="#3d-extension">3D Space</a></li>
+                <li><a href="#covariance">Covariance</a></li>
+                <li><a href="#implementation">Code</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Variational Autoencoder Tutorial</h1>
+            <p class="hero-subtitle">Understanding Latent Space Through Interactive Visualizations</p>
+            <div class="hero-badges">
+                <span class="badge badge-primary">Deep Learning</span>
+                <span class="badge badge-secondary">Generative Models</span>
+                <span class="badge badge-accent">MNIST</span>
+            </div>
+            <a href="#introduction" class="btn btn-primary">Start Learning</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        
+        <!-- Table of Contents -->
+        <section class="toc-section">
+            <div class="toc-card">
+                <h2>📚 Table of Contents</h2>
+                <ol class="toc-list">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#what-is-vae">What is a VAE?</a></li>
+                    <li><a href="#architecture">Model Architecture</a></li>
+                    <li><a href="#2d-experiments">2D Latent Space Experiments</a></li>
+                    <li><a href="#3d-extension">3D Latent Space Extension</a></li>
+                    <li><a href="#covariance">Non-Equal Covariance Prior</a></li>
+                    <li><a href="#implementation">Implementation Guide</a></li>
+                    <li><a href="#results">Results & Visualizations</a></li>
+                    <li><a href="#references">References</a></li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Introduction -->
+        <section id="introduction" class="content-section">
+            <h2 class="section-title">🎯 Introduction</h2>
+            <div class="content-card">
+                <p class="lead">
+                    A <strong>Variational Autoencoder (VAE)</strong> is a powerful generative model that learns to encode input data into a low-dimensional probabilistic latent space and reconstruct it back to the original form. 
+                </p>
+                <p>
+                    Unlike standard autoencoders that map each input deterministically to a latent vector, VAEs learn a <em>distribution</em> over the latent variables. This fundamental difference enables a range of powerful capabilities.
+                </p>
+                
+                <div class="info-box info-box-blue">
+                    <h3>Why VAEs Matter</h3>
+                    <ul>
+                        <li>✨ <strong>Generation</strong>: Create new, realistic samples by sampling from latent space</li>
+                        <li>🔄 <strong>Interpolation</strong>: Smooth transitions between data points</li>
+                        <li>📊 <strong>Representation Learning</strong>: Discover meaningful low-dimensional structure</li>
+                        <li>🎲 <strong>Probabilistic Framework</strong>: Principled uncertainty quantification</li>
+                    </ul>
+                </div>
+
+                <p>
+                    In this tutorial, we'll explore VAEs through hands-on experiments on the <strong>MNIST dataset</strong> of handwritten digits. We'll start with a simple 2D latent space for easy visualization, extend to 3D for increased capacity, and experiment with different prior distributions.
+                </p>
+            </div>
+        </section>
+
+        <!-- What is a VAE -->
+        <section id="what-is-vae" class="content-section">
+            <h2 class="section-title">🧠 What is a VAE?</h2>
+            
+            <div class="content-card">
+                <h3>Core Components</h3>
+                <div class="grid-3">
+                    <div class="component-card">
+                        <div class="component-icon">📥</div>
+                        <h4>Encoder</h4>
+                        <p>Compresses input \(x\) into latent variables \(z\)</p>
+                        <p class="math-inline">\(q(z|x) = \mathcal{N}(\mu, \sigma^2)\)</p>
+                    </div>
+                    <div class="component-card">
+                        <div class="component-icon">🎲</div>
+                        <h4>Latent Space</h4>
+                        <p>Probabilistic representation</p>
+                        <p class="math-inline">\(p(z) = \mathcal{N}(0, I)\)</p>
+                    </div>
+                    <div class="component-card">
+                        <div class="component-icon">📤</div>
+                        <h4>Decoder</h4>
+                        <p>Reconstructs from latent samples</p>
+                        <p class="math-inline">\(p(x|z)\)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>The Reparameterization Trick</h3>
+                <p>
+                    To enable backpropagation through random sampling, VAEs use a clever technique that separates the stochastic component from learnable parameters:
+                </p>
+                <div class="math-block">
+                    \[z = \mu + \sigma \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)\]
+                </div>
+                <p class="caption">
+                    The randomness is isolated in \(\epsilon\), allowing gradients to flow through \(\mu\) and \(\sigma\)
+                </p>
+            </div>
+
+            <div class="content-card">
+                <h3>Loss Function</h3>
+                <p>The VAE optimizes two objectives simultaneously:</p>
+                <div class="math-block">
+                    \[\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{reconstruction}} + \beta \cdot \mathcal{L}_{\text{KL}}\]
+                </div>
+                
+                <div class="grid-2">
+                    <div class="loss-card">
+                        <h4>🎯 Reconstruction Loss</h4>
+                        <p>Ensures the output matches the input</p>
+                        <p class="small-text">Binary cross-entropy or MSE</p>
+                    </div>
+                    <div class="loss-card">
+                        <h4>📐 KL Divergence</h4>
+                        <p>Regularizes latent space to match prior</p>
+                        <div class="math-small">
+                            \[\frac{1}{2} \sum_{i} (1 + \log(\sigma_i^2) - \mu_i^2 - \sigma_i^2)\]
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box info-box-yellow">
+                    <strong>💡 Intuition:</strong> The reconstruction loss makes the VAE an autoencoder, while KL divergence makes it <em>variational</em> by ensuring the latent space has nice properties for generation.
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture -->
+        <section id="architecture" class="content-section">
+            <h2 class="section-title">🏗️ Model Architecture</h2>
+            
+            <div class="content-card">
+                <h3>2D VAE Architecture</h3>
+                <div class="architecture-diagram">
+                    <div class="arch-step">
+                        <div class="arch-label">Input</div>
+                        <div class="arch-box">28×28 grayscale<br>784 pixels</div>
+                    </div>
+                    <div class="arch-arrow">↓</div>
+                    <div class="arch-step">
+                        <div class="arch-label">Encoder</div>
+                        <div class="arch-box">Dense(512, relu)<br>Dense(256, relu)</div>
+                    </div>
+                    <div class="arch-arrow">↓</div>
+                    <div class="arch-step">
+                        <div class="arch-label">Latent Parameters</div>
+                        <div class="arch-box highlight">z_mean: Dense(2)<br>z_log_var: Dense(2)</div>
+                    </div>
+                    <div class="arch-arrow">↓</div>
+                    <div class="arch-step">
+                        <div class="arch-label">Sampling</div>
+                        <div class="arch-box highlight">z = μ + σ ⊙ ε</div>
+                    </div>
+                    <div class="arch-arrow">↓</div>
+                    <div class="arch-step">
+                        <div class="arch-label">Decoder</div>
+                        <div class="arch-box">Dense(256, relu)<br>Dense(512, relu)<br>Dense(784, sigmoid)</div>
+                    </div>
+                    <div class="arch-arrow">↓</div>
+                    <div class="arch-step">
+                        <div class="arch-label">Output</div>
+                        <div class="arch-box">28×28 reconstructed</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Training Hyperparameters</h3>
+                <div class="params-grid">
+                    <div class="param-item">
+                        <span class="param-key">Optimizer</span>
+                        <span class="param-value">Adam</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-key">Epochs</span>
+                        <span class="param-value">30</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-key">Batch Size</span>
+                        <span class="param-value">128</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-key">Learning Rate</span>
+                        <span class="param-value">0.001</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-key">Latent Dim</span>
+                        <span class="param-value">2 (or 3)</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-key">Dataset</span>
+                        <span class="param-value">MNIST</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2D Experiments -->
+        <section id="2d-experiments" class="content-section">
+            <h2 class="section-title">🎨 2D Latent Space Experiments</h2>
+            
+            <div class="content-card">
+                <h3>Objective</h3>
+                <p>Train a VAE with a <strong>2-dimensional latent space</strong> on MNIST to:</p>
+                <ul>
+                    <li>Visualize how digits are organized in latent space</li>
+                    <li>Generate new digits by sampling from the latent space</li>
+                    <li>Understand the learned manifold structure</li>
+                </ul>
+
+                <div class="metrics-row">
+                    <div class="metric-card">
+                        <div class="metric-value">~161</div>
+                        <div class="metric-label">Reconstruction Loss</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">~3.9</div>
+                        <div class="metric-label">KL Divergence</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">~165</div>
+                        <div class="metric-label">Total Loss</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Visualization 1: Latent Manifold</h3>
+                <p>
+                    By sampling a grid of points in the 2D latent space and decoding them, we can visualize the learned manifold:
+                </p>
+                <div class="image-container">
+                    <img src="assets/latent2D.png" alt="2D Latent Manifold" class="result-image">
+                    <p class="image-caption">
+                        <strong>2D manifold of generated digits.</strong> Smooth transitions demonstrate the learned continuity of the latent space.
+                    </p>
+                </div>
+
+                <div class="observations">
+                    <h4>Key Observations</h4>
+                    <ul>
+                        <li>✅ Smooth transitions between different digit classes</li>
+                        <li>✅ Continuous manifold structure without discontinuities</li>
+                        <li>✅ Neighboring points produce visually similar digits</li>
+                        <li>✅ Edge regions show interesting interpolations between classes</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Visualization 2: Clustering</h3>
+                <p>
+                    Plotting the latent encodings of test samples reveals natural clustering by digit class:
+                </p>
+                <div class="image-container">
+                    <img src="assets/Clusters2D.png" alt="2D Clustering" class="result-image">
+                    <p class="image-caption">
+                        <strong>Distribution of digit classes in 2D latent space.</strong> Colors represent digit labels (0-9).
+                    </p>
+                </div>
+
+                <div class="observations">
+                    <h4>Key Observations</h4>
+                    <ul>
+                        <li>✅ Each digit class forms distinct clusters</li>
+                        <li>✅ Similar digits (e.g., 3 and 8, 4 and 9) positioned near each other</li>
+                        <li>✅ Some overlap indicates visual similarity</li>
+                        <li>✅ Encoder learned meaningful semantic relationships</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3D Extension -->
+        <section id="3d-extension" class="content-section">
+            <h2 class="section-title">📦 3D Latent Space Extension</h2>
+            
+            <div class="content-card">
+                <h3>Motivation</h3>
+                <p>
+                    While 2D latent spaces are easy to visualize, they may be too restrictive for complex data. By extending to 3D, we can:
+                </p>
+                <div class="grid-2">
+                    <div class="benefit-card">
+                        <span class="benefit-icon">📈</span>
+                        <p>Increase representational capacity</p>
+                    </div>
+                    <div class="benefit-card">
+                        <span class="benefit-icon">🎨</span>
+                        <p>Capture more factors of variation</p>
+                    </div>
+                    <div class="benefit-card">
+                        <span class="benefit-icon">📉</span>
+                        <p>Reduce reconstruction loss</p>
+                    </div>
+                    <div class="benefit-card">
+                        <span class="benefit-icon">🔍</span>
+                        <p>Better disentanglement</p>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <h4>Implementation</h4>
+                    <pre><code class="language-python"># Simply change the latent dimension
+latent_dim = 3  # Changed from 2
+
+# All other architecture remains the same</code></pre>
+                </div>
+
+                <div class="metrics-row">
+                    <div class="metric-card metric-improved">
+                        <div class="metric-value">~164</div>
+                        <div class="metric-label">Total Loss</div>
+                        <div class="metric-note">↓ Lower than 2D</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Visualization 1: 3D Scatter Plot</h3>
+                <div class="image-container">
+                    <img src="assets/Clusters3D.png" alt="3D Clustering" class="result-image">
+                    <p class="image-caption">
+                        <strong>3D scatter plot of encoded MNIST digits.</strong> Clear clustering with enhanced separation.
+                    </p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Visualization 2: Pairwise 2D Projections</h3>
+                <p>To understand information distribution across dimensions, we plot pairs (z₀, z₁), (z₁, z₂), and (z₀, z₂):</p>
+                <div class="image-container">
+                    <img src="assets/2D3DClusters.png" alt="2D Projections" class="result-image">
+                    <p class="image-caption">
+                        <strong>Pairwise 2D projections of 3D latent space.</strong> Each subplot shows one pair of latent dimensions.
+                    </p>
+                </div>
+
+                <div class="observations">
+                    <h4>Key Observations</h4>
+                    <ul>
+                        <li>✅ Each dimension contributes meaningful variation</li>
+                        <li>✅ Clusters remain coherent across all projections</li>
+                        <li>✅ No single dimension dominates</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Visualization 3: 2D Cross-Sections</h3>
+                <p>By fixing z₂ and varying (z₀, z₁), we can slice through the 3D manifold:</p>
+                
+                <div class="slice-grid">
+                    <div class="slice-item">
+                        <img src="assets/3Dlatent1.png" alt="z2 = -1.0" class="slice-image">
+                        <p class="slice-label">z₂ = -1.0</p>
+                    </div>
+                    <div class="slice-item">
+                        <img src="assets/3DLatent2.png" alt="z2 = 0.0" class="slice-image">
+                        <p class="slice-label">z₂ = 0.0</p>
+                    </div>
+                    <div class="slice-item">
+                        <img src="assets/3DLatent3.png" alt="z2 = 1.0" class="slice-image">
+                        <p class="slice-label">z₂ = 1.0</p>
+                    </div>
+                </div>
+
+                <div class="observations">
+                    <h4>Key Observations</h4>
+                    <ul>
+                        <li>✅ Different slices show different digit styles</li>
+                        <li>✅ z₂ primarily modulates stroke thickness and style</li>
+                        <li>✅ z₀ and z₁ capture digit identity</li>
+                        <li>✅ Smooth transitions demonstrate continuity</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Covariance -->
+        <section id="covariance" class="content-section">
+            <h2 class="section-title">🔄 Non-Equal Covariance Prior</h2>
+            
+            <div class="content-card">
+                <h3>Motivation</h3>
+                <p>The standard VAE assumes an <strong>isotropic prior</strong>:</p>
+                <div class="math-block">
+                    \[p(z) = \mathcal{N}(0, I)\]
+                </div>
+                <p>
+                    This enforces independence between latent dimensions. However, real-world factors are often correlated. We can model this with a <strong>correlated Gaussian prior</strong>:
+                </p>
+                <div class="math-block">
+                    \[p(z) = \mathcal{N}(0, \Sigma)\]
+                </div>
+                <p>where \(\Sigma\) is a full covariance matrix.</p>
+            </div>
+
+            <div class="content-card">
+                <h3>Implementation Changes</h3>
+                
+                <div class="change-section">
+                    <h4>1. Modified Sampling Layer</h4>
+                    <p>Replace standard reparameterization with Cholesky-based sampling:</p>
+                    <div class="code-block">
+                        <pre><code class="language-python"># Standard: z = μ + σ ⊙ ε
+# Correlated: z = μ + L ε, where Σ = L Lᵀ
+
+L = np.linalg.cholesky(Sigma)
+z = z_mean + tf.matmul(epsilon, L.T)</code></pre>
+                    </div>
+
+                    <p>For this experiment, we use:</p>
+                    <div class="math-block">
+                        \[\Sigma = \begin{bmatrix} 1.0 & 0.4 \\ 0.4 & 0.5 \end{bmatrix}\]
+                    </div>
+                    <p class="caption">This introduces positive correlation between z₀ and z₁</p>
+                </div>
+
+                <div class="change-section">
+                    <h4>2. Updated KL Divergence</h4>
+                    <p>The KL divergence must account for the correlated prior:</p>
+                    <div class="math-block math-small">
+                        \[D_{KL}(q(z|x) \| p(z)) = \frac{1}{2} \left[\text{tr}(\Sigma^{-1}\text{diag}(\sigma^2)) + \mu^T\Sigma^{-1}\mu - k + \log\frac{\det(\Sigma)}{\prod_i \sigma_i^2}\right]\]
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Results</h3>
+                <div class="grid-2">
+                    <div class="image-container">
+                        <img src="assets/KLAdapted.png" alt="Correlated Manifold" class="result-image">
+                        <p class="image-caption">Generated manifold showing tilted digit transitions</p>
+                    </div>
+                    <div class="image-container">
+                        <img src="assets/Screenshot%202025-11-07%20at%2014.41.06.png" alt="Correlated Clusters" class="result-image">
+                        <p class="image-caption">Latent encodings (z₀, z₁) under correlated prior</p>
+                    </div>
+                </div>
+
+                <div class="observations">
+                    <h4>Key Observations</h4>
+                    <ul>
+                        <li>✅ Manifold appears <strong>tilted and stretched</strong></li>
+                        <li>✅ Latent clusters form elongated, rotated patterns</li>
+                        <li>✅ Geometry matches correlation structure in Σ</li>
+                        <li>✅ Reconstruction quality remains similar to isotropic case</li>
+                    </ul>
+                </div>
+
+                <div class="info-box info-box-green">
+                    <strong>💡 Discussion:</strong> Introducing correlation adds flexibility by allowing latent dimensions to capture related factors of variation. While reconstruction remains comparable, the latent geometry becomes more structured and interpretable.
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementation -->
+        <section id="implementation" class="content-section">
+            <h2 class="section-title">💻 Implementation Guide</h2>
+            
+            <div class="content-card">
+                <h3>Prerequisites</h3>
+                <div class="code-block">
+                    <pre><code class="language-bash">pip install tensorflow keras numpy matplotlib scikit-learn</code></pre>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Basic 2D VAE Implementation</h3>
+                <div class="code-block">
+                    <pre><code class="language-python">import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# Hyperparameters
+latent_dim = 2
+input_shape = (28, 28, 1)
+
+# Encoder
+encoder_inputs = keras.Input(shape=input_shape)
+x = layers.Flatten()(encoder_inputs)
+x = layers.Dense(512, activation='relu')(x)
+x = layers.Dense(256, activation='relu')(x)
+
+z_mean = layers.Dense(latent_dim, name='z_mean')(x)
+z_log_var = layers.Dense(latent_dim, name='z_log_var')(x)
+
+# Sampling layer
+def sampling(args):
+    z_mean, z_log_var = args
+    batch = tf.shape(z_mean)[0]
+    dim = tf.shape(z_mean)[1]
+    epsilon = tf.keras.backend.random_normal(shape=(batch, dim))
+    return z_mean + tf.exp(0.5 * z_log_var) * epsilon
+
+z = layers.Lambda(sampling, name='z')([z_mean, z_log_var])
+
+encoder = keras.Model(encoder_inputs, [z_mean, z_log_var, z], name='encoder')
+
+# Decoder
+latent_inputs = keras.Input(shape=(latent_dim,))
+x = layers.Dense(256, activation='relu')(latent_inputs)
+x = layers.Dense(512, activation='relu')(x)
+x = layers.Dense(28 * 28, activation='sigmoid')(x)
+decoder_outputs = layers.Reshape((28, 28, 1))(x)
+
+decoder = keras.Model(latent_inputs, decoder_outputs, name='decoder')
+
+# VAE Model
+class VAE(keras.Model):
+    def __init__(self, encoder, decoder, **kwargs):
+        super(VAE, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+        
+    def call(self, inputs):
+        z_mean, z_log_var, z = self.encoder(inputs)
+        reconstructed = self.decoder(z)
+        
+        # KL divergence loss
+        kl_loss = -0.5 * tf.reduce_mean(
+            z_log_var - tf.square(z_mean) - tf.exp(z_log_var) + 1
+        )
+        self.add_loss(kl_loss)
+        
+        return reconstructed
+
+# Compile and train
+vae = VAE(encoder, decoder)
+vae.compile(optimizer='adam', loss='binary_crossentropy')
+
+# Load MNIST data
+(x_train, _), (x_test, _) = keras.datasets.mnist.load_data()
+x_train = x_train.astype('float32') / 255.0
+x_train = np.expand_dims(x_train, -1)
+
+# Train
+vae.fit(x_train, x_train, epochs=30, batch_size=128, validation_split=0.1)</code></pre>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Visualization Code</h3>
+                <div class="code-block">
+                    <pre><code class="language-python">import matplotlib.pyplot as plt
+
+# 1. Plot latent space clusters
+z_mean, _, _ = encoder.predict(x_test)
+plt.figure(figsize=(10, 8))
+plt.scatter(z_mean[:, 0], z_mean[:, 1], c=y_test, cmap='tab10', alpha=0.5)
+plt.colorbar()
+plt.xlabel('z[0]')
+plt.ylabel('z[1]')
+plt.title('2D Latent Space Clustering')
+plt.show()
+
+# 2. Generate manifold grid
+n = 20
+grid_x = np.linspace(-3, 3, n)
+grid_y = np.linspace(-3, 3, n)
+
+figure = np.zeros((28 * n, 28 * n))
+for i, yi in enumerate(grid_y):
+    for j, xi in enumerate(grid_x):
+        z_sample = np.array([[xi, yi]])
+        x_decoded = decoder.predict(z_sample)
+        digit = x_decoded[0].reshape(28, 28)
+        figure[i * 28: (i + 1) * 28,
+               j * 28: (j + 1) * 28] = digit
+
+plt.figure(figsize=(10, 10))
+plt.imshow(figure, cmap='viridis')
+plt.title('2D Latent Manifold')
+plt.axis('off')
+plt.show()</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results -->
+        <section id="results" class="content-section">
+            <h2 class="section-title">📊 Results & Visualizations</h2>
+            
+            <div class="content-card">
+                <h3>Summary Table</h3>
+                <div class="table-container">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Configuration</th>
+                                <th>Latent Dim</th>
+                                <th>Total Loss</th>
+                                <th>KL Loss</th>
+                                <th>Reconstruction Loss</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Standard 2D</td>
+                                <td>2</td>
+                                <td>~165</td>
+                                <td>~3.9</td>
+                                <td>~161</td>
+                            </tr>
+                            <tr class="highlight-row">
+                                <td>Standard 3D</td>
+                                <td>3</td>
+                                <td>~164</td>
+                                <td>~4.2</td>
+                                <td>~160</td>
+                            </tr>
+                            <tr>
+                                <td>Correlated 2D</td>
+                                <td>2</td>
+                                <td>~166</td>
+                                <td>~4.1</td>
+                                <td>~162</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Key Findings</h3>
+                <div class="findings-grid">
+                    <div class="finding-card">
+                        <h4>🎨 2D Latent Space</h4>
+                        <ul>
+                            <li>Easy to visualize and interpret</li>
+                            <li>Clear digit clustering</li>
+                            <li>Smooth manifold transitions</li>
+                            <li>Sufficient for MNIST complexity</li>
+                        </ul>
+                    </div>
+                    <div class="finding-card">
+                        <h4>📦 3D Latent Space</h4>
+                        <ul>
+                            <li>Slightly better reconstruction</li>
+                            <li>Captures style variations</li>
+                            <li>More disentangled representations</li>
+                            <li>Interpretable through projections</li>
+                        </ul>
+                    </div>
+                    <div class="finding-card">
+                        <h4>🔄 Correlated Prior</h4>
+                        <ul>
+                            <li>Reshapes latent geometry</li>
+                            <li>Models dependent factors</li>
+                            <li>Similar reconstruction quality</li>
+                            <li>More structured organization</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Key Takeaways</h3>
+                <div class="info-box info-box-blue">
+                    <h4>What We Learned</h4>
+                    <ol>
+                        <li>VAEs learn <strong>continuous latent representations</strong> enabling smooth interpolation and generation</li>
+                        <li>The <strong>dimensionality of latent space</strong> affects both reconstruction quality and interpretability</li>
+                        <li><strong>KL divergence regularization</strong> is crucial for learning structured, meaningful latent spaces</li>
+                        <li><strong>Different priors</strong> (isotropic vs. correlated) influence geometry of learned representations</li>
+                        <li><strong>Visualization techniques</strong> help understand what the model learns</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>When to Use VAEs</h3>
+                <div class="grid-2">
+                    <div class="pros-card">
+                        <h4>✅ Good For</h4>
+                        <ul>
+                            <li>Learning compact data representations</li>
+                            <li>Generating new samples similar to training data</li>
+                            <li>Interpolating between data points</li>
+                            <li>Unsupervised feature learning</li>
+                            <li>Data compression with probabilistic framework</li>
+                        </ul>
+                    </div>
+                    <div class="cons-card">
+                        <h4>❌ Limitations</h4>
+                        <ul>
+                            <li>Generated samples may be blurry (vs GANs)</li>
+                            <li>Assumes specific distributional form</li>
+                            <li>KL divergence can be difficult to balance</li>
+                            <li>May struggle with very high-dimensional latent spaces</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- References -->
+        <section id="references" class="content-section">
+            <h2 class="section-title">🔗 References</h2>
+            
+            <div class="content-card">
+                <h3>Papers</h3>
+                <ul class="reference-list">
+                    <li>
+                        <a href="https://arxiv.org/abs/1312.6114" target="_blank">
+                            Auto-Encoding Variational Bayes
+                        </a> — Kingma & Welling (2013)
+                    </li>
+                    <li>
+                        <a href="https://arxiv.org/abs/1606.05908" target="_blank">
+                            Tutorial on Variational Autoencoders
+                        </a> — Doersch (2016)
+                    </li>
+                </ul>
+            </div>
+
+            <div class="content-card">
+                <h3>Code Resources</h3>
+                <ul class="reference-list">
+                    <li>
+                        <a href="https://keras.io/examples/generative/vae/" target="_blank">
+                            Keras VAE Example
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.tensorflow.org/tutorials/generative/cvae" target="_blank">
+                            TensorFlow CVAE Tutorial
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="content-card">
+                <h3>Additional Reading</h3>
+                <ul class="reference-list">
+                    <li>
+                        <a href="https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73" target="_blank">
+                            Understanding VAEs
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://lilianweng.github.io/posts/2018-08-12-vae/" target="_blank">
+                            From Autoencoder to Beta-VAE
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>
+                <strong>Variational Autoencoder Tutorial</strong> by Maroua Oukrid
+            </p>
+            <p>
+                Last Updated: November 2024 | 
+                <a href="https://github.com" target="_blank">View on GitHub</a>
+            </p>
+            <p class="footer-note">
+                If you found this tutorial helpful, please star the repository! ⭐
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
+
