@@ -6,29 +6,18 @@ email: "your.email@example.com"
 url: "https://OMaroua.github.io"
 baseurl: "/Tutorials"
 
-# Theme - using custom theme
+# Theme - using custom layouts
 # theme: jekyll-theme-cayman
 # remote_theme: pages-themes/cayman@v0.2.0
 plugins:
 - jekyll-feed
-# - jekyll-remote-theme
 
 # Markdown settings
 markdown: kramdown
 kramdown:
-  input: kramdown
+  input: GFM
   math_engine: mathjax
-  math_engine_opts:
-    preview: true
-    preview_as_code: false
   syntax_highlighter: rouge
-  parse_block_html: true
-  parse_span_html: true
-  hard_wrap: false
-  auto_ids: true
-  entity_output: as_char
-  toc_levels: 1..6
-  smart_quotes: lsquo,rsquo,ldquo,rdquo
 
 # Collections
 collections:
