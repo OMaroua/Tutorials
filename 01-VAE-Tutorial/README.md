@@ -23,13 +23,44 @@
 
 ## Introduction
 
-A **Variational Autoencoder (VAE)** is a powerful generative model that learns to encode input data into a low-dimensional probabilistic latent space and reconstruct it back to the original form. Unlike standard autoencoders that map each input deterministically to a latent vector, VAEs learn a *distribution* over the latent variables.
+Modern machine learning models—from autoencoders to large language models—rely on **latent representations**: compact, abstract encodings of data that capture structure, meaning, or features without directly mirroring the raw input. A latent representation is a vector (or set of vectors) in a hidden space learned from data, which encodes the input in a way that makes downstream tasks easier.
 
-**Why is this important?**
-- Enables generation of new, realistic samples
-- Creates smooth, continuous latent representations
-- Allows interpolation between data points
-- Provides a probabilistic framework for understanding data
+Latent spaces often have meaningful geometric properties:
+- **Clustering**: Similar items group together
+- **Semantic linearity**: Meaningful arithmetic (e.g., in word embeddings: `king - man + woman ≈ queen`)
+- **Manifold structure**: High-dimensional data lies on lower-dimensional manifolds
+
+To learn such representations in an unsupervised way, we need models that can compress data into lower-dimensional manifolds while preserving essential information. This is where **autoencoders** come into play.
+
+### The Problem with Standard Autoencoders
+
+A standard autoencoder (AE) maps input $x \in \mathbb{R}^D$ to a deterministic latent point $z \in \mathbb{R}^d$ (where $d \ll D$) via an encoder $f_\phi: \mathbb{R}^D \to \mathbb{R}^d$, then reconstructs it via a decoder $g_\theta: \mathbb{R}^d \to \mathbb{R}^D$:
+
+$$z = f_\phi(x), \quad \hat{x} = g_\theta(z)$$
+
+The training objective minimizes reconstruction error:
+
+$$\mathcal{L}_{AE} = \mathbb{E}_{x \sim p_{data}(x)}[\|x - g_\theta(f_\phi(x))\|^2]$$
+
+**Limitations of Standard Autoencoders:**
+1. **Discontinuous latent space**: The learned space is patchy and irregular
+2. **No generative capability**: Cannot sample random points and expect realistic outputs
+3. **Poor interpolation**: Intermediate points between encoded samples produce unrealistic reconstructions
+4. **Overfitting to training data**: Each input maps to a single point, not capturing data variability
+
+### Variational Autoencoders: The Solution
+
+A **Variational Autoencoder (VAE)** solves these issues by:
+- Learning a **distribution** over latent variables instead of deterministic points
+- Imposing a **prior** $p(z) = \mathcal{N}(0, I)$ on the latent space
+- Using **variational inference** to approximate the true posterior
+- Creating a **continuous, smooth, generative** latent space
+
+This probabilistic approach enables:
+- Generation of new, realistic samples by sampling from the prior
+- Smooth interpolation between data points
+- Meaningful latent space structure
+- Quantification of uncertainty
 
 In this tutorial, we'll explore VAEs through experiments on the **MNIST** dataset of handwritten digits, starting with a simple 2D latent space and progressively adding complexity.
 
@@ -106,25 +137,55 @@ Gradients can now pass through the deterministic transformation.
 
 ### Loss Function Derivation
 
-#### Evidence Lower Bound (ELBO)
+We present two derivations of the Evidence Lower Bound (ELBO), each providing different insights.
 
-Starting from the log-likelihood of the data:
+#### Derivation 1: Using Jensen's Inequality
 
-$$\log p_\theta(x) = \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x)]$$
+Our goal is to maximize the log-likelihood:
 
-We can decompose this using the variational distribution:
+$$\theta^* = \arg\max_\theta \mathbb{E}_{x \sim p(x)}[\log p_\theta(x)]$$
 
-$$\log p_\theta(x) = \mathbb{E}_{q_\phi(z|x)}\left[\log \frac{p_\theta(x,z)}{p_\theta(z|x)}\right]$$
+Since we assume data $x$ is generated from latent variable $z$, we express the log-likelihood through marginalization:
+
+$$\log p_\theta(x) = \log \int p_\theta(x|z)p(z)dz$$
+
+This integral is **intractable** when $p_\theta(x|z)$ is a complex neural network. We introduce an approximate posterior $q_\phi(z|x)$ (the encoder):
+
+$$\log p_\theta(x) = \log \int \frac{q_\phi(z|x)}{q_\phi(z|x)} p_\theta(x|z)p(z)dz$$
+
+$$= \log \mathbb{E}_{z \sim q_\phi(z|x)}\left[\frac{p_\theta(x|z)p(z)}{q_\phi(z|x)}\right]$$
+
+By **Jensen's inequality** (since $\log$ is concave, $\log \mathbb{E}[X] \geq \mathbb{E}[\log X]$):
+
+$$\log p_\theta(x) \geq \mathbb{E}_{z \sim q_\phi(z|x)}\left[\log \frac{p_\theta(x|z)p(z)}{q_\phi(z|x)}\right] = \text{ELBO}$$
+
+Thus: $\log p_\theta(x) \geq \mathcal{L}(\theta, \phi; x)$
+
+#### Derivation 2: Alternate Form (Showing Tightness of Bound)
+
+This derivation reveals why maximizing ELBO maximizes the likelihood. Starting with $\log p_\theta(x)$:
+
+$$\log p_\theta(x) = \log p_\theta(x) \int q_\phi(z|x)dz \quad \text{(since } \int q_\phi(z|x)dz = 1\text{)}$$
+
+$$= \int q_\phi(z|x) \log p_\theta(x) dz = \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x)]$$
+
+Using conditional probability $p_\theta(x) = \frac{p_\theta(x,z)}{p_\theta(z|x)}$:
+
+$$= \mathbb{E}_{q_\phi(z|x)}\left[\log \frac{p_\theta(x,z)}{p_\theta(z|x)}\right]$$
+
+Multiply and divide by $q_\phi(z|x)$:
 
 $$= \mathbb{E}_{q_\phi(z|x)}\left[\log \frac{p_\theta(x,z)}{q_\phi(z|x)} \cdot \frac{q_\phi(z|x)}{p_\theta(z|x)}\right]$$
 
-$$= \mathbb{E}_{q_\phi(z|x)}\left[\log \frac{p_\theta(x,z)}{q_\phi(z|x)}\right] + \mathbb{E}_{q_\phi(z|x)}\left[\log \frac{q_\phi(z|x)}{p_\theta(z|x)}\right]$$
+$$= \underbrace{\mathbb{E}_{q_\phi(z|x)}\left[\log \frac{p_\theta(x,z)}{q_\phi(z|x)}\right]}_{\mathcal{L}(\theta,\phi;x) \text{ (ELBO)}} + \underbrace{\mathbb{E}_{q_\phi(z|x)}\left[\log \frac{q_\phi(z|x)}{p_\theta(z|x)}\right]}_{D_{KL}(q_\phi(z|x) \| p_\theta(z|x))}$$
 
-$$= \underbrace{\mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x,z) - \log q_\phi(z|x)]}_{\text{ELBO } \mathcal{L}(\theta,\phi;x)} + \underbrace{D_{KL}(q_\phi(z|x) \| p_\theta(z|x))}_{\geq 0}$$
+**Key Insights:**
 
-Since KL divergence is non-negative, the ELBO is a lower bound on the log-likelihood:
-
-$$\log p_\theta(x) \geq \mathcal{L}(\theta,\phi;x)$$
+1. Since $D_{KL} \geq 0$, we have $\mathcal{L}(\theta,\phi;x) \leq \log p_\theta(x)$ (ELBO is a lower bound)
+2. The KL divergence measures:
+   - **Approximation quality**: How close $q_\phi(z|x)$ is to true posterior $p_\theta(z|x)$
+   - **Tightness of bound**: The gap between ELBO and log-likelihood
+3. Better approximation → Lower KL → Tighter bound
 
 #### Decomposition of ELBO
 
@@ -166,9 +227,52 @@ $$\mathcal{L}_{\text{total}} = -\mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)] + D
 
 $$= \mathcal{L}_{\text{reconstruction}} + \mathcal{L}_{\text{KL}}$$
 
-For binary data (MNIST), reconstruction loss uses binary cross-entropy:
+**For Gaussian Posterior and Prior:**
 
-$$\mathcal{L}_{\text{reconstruction}} = -\sum_{i=1}^{d} x_i \log \hat{x}_i + (1-x_i)\log(1-\hat{x}_i)$$
+With $q_\phi(z|x) = \mathcal{N}(\mu_\phi(x), \sigma_\phi^2(x)I)$ and $p(z) = \mathcal{N}(0, I)$, the KL term has a **closed-form solution**:
+
+$$D_{KL}(q_\phi(z|x) \| p(z)) = \frac{1}{2} \sum_{j=1}^{d} \left(\mu_j^2 + \sigma_j^2 - \log(\sigma_j^2) - 1\right)$$
+
+**Reconstruction Loss:**
+
+For binary data (MNIST), we use binary cross-entropy:
+
+$$\mathcal{L}_{\text{reconstruction}} = -\sum_{i=1}^{D} \left[x_i \log \hat{x}_i + (1-x_i)\log(1-\hat{x}_i)\right]$$
+
+For continuous data, we use MSE:
+
+$$\mathcal{L}_{\text{reconstruction}} = \|x - \hat{x}\|_2^2$$
+
+where $\hat{x} = g_\theta(z)$ is the decoder output.
+
+**Complete VAE Training Loss:**
+
+$$\mathcal{L}_{VAE}(x) = \|x - g_\theta(z)\|_2^2 + \frac{1}{2} \sum_{j=1}^{d} \left(\mu_j^2 + \sigma_j^2 - \log(\sigma_j^2) - 1\right)$$
+
+where $z = \mu_\phi(x) + \sigma_\phi(x) \odot \epsilon$ and $\epsilon \sim \mathcal{N}(0, I)$.
+
+### Training Algorithm
+
+The complete training procedure for VAE:
+
+**Algorithm: VAE Training**
+
+1. **Initialize**: Randomly initialize encoder parameters $\phi$ and decoder parameters $\theta$
+2. **Repeat** until convergence:
+   - Sample minibatch $\{x^{(1)}, x^{(2)}, \ldots, x^{(M)}\}$ from dataset
+   - **For each** $x^{(i)}$ in minibatch:
+     - **Encode**: Compute $\mu_\phi(x^{(i)})$ and $\sigma_\phi(x^{(i)})$ using encoder
+     - **Sample**: Draw $\epsilon^{(i)} \sim \mathcal{N}(0, I)$
+     - **Reparameterize**: $z^{(i)} = \mu_\phi(x^{(i)}) + \sigma_\phi(x^{(i)}) \odot \epsilon^{(i)}$
+     - **Decode**: $\hat{x}^{(i)} = g_\theta(z^{(i)})$ using decoder
+     - **Compute loss**: 
+       $$\mathcal{L}_{VAE}(x^{(i)}) = \|x^{(i)} - \hat{x}^{(i)}\|_2^2 + \frac{1}{2}\sum_{j=1}^{d}(\mu_j^2 + \sigma_j^2 - \log(\sigma_j^2) - 1)$$
+   - **Minibatch loss**: $\mathcal{L}_{batch} = \frac{1}{M}\sum_{i=1}^{M} \mathcal{L}_{VAE}(x^{(i)})$
+   - **Update parameters**: 
+     - $\theta \leftarrow \theta - \eta \nabla_\theta \mathcal{L}_{batch}$
+     - $\phi \leftarrow \phi - \eta \nabla_\phi \mathcal{L}_{batch}$
+
+where $\eta$ is the learning rate.
 
 ---
 
@@ -299,6 +403,39 @@ Plotting the latent encodings of test samples reveals natural clustering:
 - Similar digits (e.g., 3 and 8, 4 and 9) are positioned near each other
 - Some overlap indicates visual similarity
 - The encoder has learned meaningful semantic relationships
+
+### Comparison: VAE vs Standard Autoencoder
+
+To demonstrate the advantages of VAEs over standard autoencoders, we compare their key properties:
+
+| Property | Standard Autoencoder | Variational Autoencoder |
+|----------|---------------------|------------------------|
+| **Latent Mapping** | Deterministic point $z = f_\phi(x)$ | Probabilistic distribution $q_\phi(z\|x)$ |
+| **Latent Space** | Discontinuous, patchy | Continuous, smooth |
+| **Interpolation** | Poor, unrealistic intermediates | Smooth, semantically meaningful |
+| **Generation** | Cannot sample random points | Sample from prior $z \sim \mathcal{N}(0,I)$ |
+| **Training Objective** | MSE reconstruction only | ELBO (reconstruction + KL) |
+| **Regularization** | None (overfits to training data) | KL divergence to prior |
+| **Use Cases** | Compression, denoising | Generation, semi-supervised learning |
+
+**Interpolation Quality:**
+
+When linearly interpolating between two latent points $z_1$ and $z_2$ using $z_t = (1-t)z_1 + tz_2$:
+- **Standard AE**: Produces unrealistic, garbled intermediate images
+- **VAE**: Generates smooth transitions with semantically meaningful intermediates
+
+**Generative Sampling:**
+
+When sampling random latent codes:
+- **Standard AE**: Random $z$ produces garbage since latent space has "holes"
+- **VAE**: $z \sim \mathcal{N}(0, I)$ produces realistic novel digits
+
+**Latent Space Structure:**
+
+- **Standard AE**: Encoder maps each training example to an isolated point; space between points is undefined
+- **VAE**: Prior regularization ensures latent space is continuous and well-structured throughout
+
+This comparison highlights why VAEs are preferred for generative modeling tasks, as demonstrated in the reference tutorial by Prabhav Agarwal [[1]](https://prabhavag.github.io/Representations/VAE).
 
 ---
 
