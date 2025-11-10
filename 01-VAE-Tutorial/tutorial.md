@@ -274,7 +274,7 @@ $
 p(\mathbf{z}) = \mathcal{N}(\mathbf{z}; \mathbf{0}, \mathbf{I})
 $
 
-The decoder network parameterizes $p_\theta(\mathbf{x}|\mathbf{z})$ , often as:
+The decoder network parameterizes $p_\theta(\mathbf{x}\mid\mathbf{z})$ , often as:
 
 $
 p_\theta(\mathbf{x}|\mathbf{z}) = \mathcal{N}(\mathbf{x}; \boldsymbol{\mu}_\theta(\mathbf{z}), \boldsymbol{\sigma}_\theta^2(\mathbf{z})\mathbf{I})
@@ -287,7 +287,7 @@ $
 
 The true posterior $$\boldsymbol{p_\theta(\mathbf{z}|\mathbf{x})}$$ is intractable to compute directly. Instead, we introduce an **approximate posterior** (also called the **recognition model** or **inference network**):
 
-$$q_\phi(\mathbf{z}|\mathbf{x}) = \mathcal{N}(\mathbf{z}; \boldsymbol{\mu}_\phi(\mathbf{x}), \boldsymbol{\sigma}_\phi^2(\mathbf{x})\mathbf{I})$$
+$$q_\phi(\mathbf{z}\mid\mathbf{x}) = \mathcal{N}(\mathbf{z}; \boldsymbol{\mu}_\phi(\mathbf{x}), \boldsymbol{\sigma}_\phi^2(\mathbf{x})\mathbf{I})$$
 
 where the encoder network outputs the parameters $$\boldsymbol{\mu}_\phi(\mathbf{x})$$ and $$\boldsymbol{\sigma}_\phi^2(\mathbf{x})$$ of a Gaussian distribution.
 
@@ -316,8 +316,8 @@ $$\log p_\theta(\mathbf{x}) = \log \int p_\theta(\mathbf{x}|\mathbf{z}) p(\mathb
 This integral is **intractable** for several reasons:
 
 1. **High Dimensionality**: If $$\mathbf{z} \in \mathbb{R}^d$$, we need to integrate over a $$d$$-dimensional space
-2. **Complex Decoder**: When $$p_\theta(\mathbf{x}|\mathbf{z})$$ is parameterized by a neural network, the integral has no closed form
-3. **Posterior Computation**: Computing $$p_\theta(\mathbf{z}|\mathbf{x})$$ requires knowing $$p_\theta(\mathbf{x})$$, creating a circular dependency
+2. **Complex Decoder**: When $$p_\theta(\mathbf{x}\mid\mathbf{z})$$ is parameterized by a neural network, the integral has no closed form
+3. **Posterior Computation**: Computing $$p_\theta(\mathbf{z}\mid\mathbf{x})$$ requires knowing $$p_\theta(\mathbf{x})$$, creating a circular dependency
 
 The solution is to derive a lower bound on the log likelihood that is tractable to optimize. This is called the **Evidence Lower Bound (ELBO)**.
 
@@ -333,7 +333,7 @@ Starting with the log marginal likelihood:
 
 $$\log p_\theta(\mathbf{x}) = \log \int p_\theta(\mathbf{x}|\mathbf{z}) p(\mathbf{z}) d\mathbf{z}$$
 
-We multiply and divide by the approximate posterior $$q_\phi(\mathbf{z}|\mathbf{x})$$:
+We multiply and divide by the approximate posterior $$q_\phi(\mathbf{z}\mid\mathbf{x})$$:
 
 $$\log p_\theta(\mathbf{x}) = \log \int \frac{q_\phi(\mathbf{z}|\mathbf{x})}{q_\phi(\mathbf{z}|\mathbf{x})} p_\theta(\mathbf{x}|\mathbf{z}) p(\mathbf{z}) d\mathbf{z}$$
 
@@ -376,7 +376,7 @@ $$\log p_\theta(\mathbf{x}) \geq \mathcal{L}_{\theta,\phi}(\mathbf{x})$$
 The ELBO is a **lower bound** on the log likelihood. Maximizing the ELBO pushes up the log likelihood. However, this derivation doesn't reveal:
 - How tight the bound is
 - What happens when we maximize the ELBO
-- The relationship between $q_\phi$ and the true posterior $p_\theta(\mathbf{z}|\mathbf{x})$
+- The relationship between $q_\phi$ and the true posterior $p_\theta(\mathbf{z}\mid\mathbf{x})$
 
 For these insights, we need an alternative derivation.
 
@@ -414,7 +414,7 @@ $$\log p_\theta(\mathbf{x}) = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\log p
 
 ### Step 5: Introduce the Approximate Posterior
 
-Multiply and divide by $$q_\phi(\mathbf{z}|\mathbf{x})$$:
+Multiply and divide by $$q_\phi(\mathbf{z}\mid\mathbf{x})$$:
 
 $$\log p_\theta(\mathbf{x}) = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} \left[ \log \frac{p_\theta(\mathbf{x}, \mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} \cdot \frac{q_\phi(\mathbf{z}|\mathbf{x})}{p_\theta(\mathbf{z}|\mathbf{x})} \right]$$
 
@@ -426,7 +426,7 @@ The first term is the **ELBO**:
 
 $$\mathcal{L}_{\theta,\phi}(\mathbf{x}) = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} \left[ \log \frac{p_\theta(\mathbf{x}, \mathbf{z})}{q_\phi(\mathbf{z}|\mathbf{x})} \right]$$
 
-The second term is the **KL divergence** between $$q_\phi(\mathbf{z}|\mathbf{x})$$ and $$p_\theta(\mathbf{z}|\mathbf{x})$$:
+The second term is the **KL divergence** between $$q_\phi(\mathbf{z}\mid\mathbf{x})$$ and $$p_\theta(\mathbf{z}\mid\mathbf{x})$$:
 
 $$D_{KL}(q_\phi(\mathbf{z}|\mathbf{x}) \| p_\theta(\mathbf{z}|\mathbf{x})) = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} \left[ \log \frac{q_\phi(\mathbf{z}|\mathbf{x})}{p_\theta(\mathbf{z}|\mathbf{x})} \right]$$
 
@@ -439,13 +439,13 @@ $$\boxed{\log p_\theta(\mathbf{x}) = \mathcal{L}_{\theta,\phi}(\mathbf{x}) + D_{
 1. **The ELBO is a Lower Bound**: Since $$D_{KL} \geq 0$$ always:
    $$\mathcal{L}_{\theta,\phi}(\mathbf{x}) \leq \log p_\theta(\mathbf{x})$$
 
-2. **Tightness of the Bound**: The gap between the ELBO and the log likelihood is exactly the KL divergence. The better $$q_\phi(\mathbf{z}|\mathbf{x})$$ approximates the true posterior $$p_\theta(\mathbf{z}|\mathbf{x})$$, the tighter the bound.
+2. **Tightness of the Bound**: The gap between the ELBO and the log likelihood is exactly the KL divergence. The better $$q_\phi(\mathbf{z}\mid\mathbf{x})$$ approximates the true posterior $$p_\theta(\mathbf{z}\mid\mathbf{x})$$, the tighter the bound.
 
 3. **Joint Optimization**: Maximizing the ELBO w.r.t. $$\phi$$ minimizes the KL divergence, making $$q_\phi$$ a better approximation to the true posterior. Maximizing w.r.t. $$\theta$$ improves the model's ability to explain the data.
 
-4. **Why This Works**: We cannot compute $$p_\theta(\mathbf{z}|\mathbf{x})$$ directly, but we don't need to! By maximizing the ELBO, we simultaneously:
+4. **Why This Works**: We cannot compute $$p_\theta(\mathbf{z}\mid\mathbf{x})$$ directly, but we don't need to! By maximizing the ELBO, we simultaneously:
    - Push up the log likelihood $$\log p_\theta(\mathbf{x})$$
-   - Make $$q_\phi(\mathbf{z}|\mathbf{x})$$ closer to $$p_\theta(\mathbf{z}|\mathbf{x})$$
+   - Make $$q_\phi(\mathbf{z}\mid\mathbf{x})$$ closer to $$p_\theta(\mathbf{z}\mid\mathbf{x})$$
 
 ---
 
@@ -473,7 +473,7 @@ $$\boxed{\mathcal{L}_{\theta,\phi}(\mathbf{x}) = \mathbb{E}_{q_\phi(\mathbf{z}|\
 
 **Reconstruction Term**: $$\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\log p_\theta(\mathbf{x}|\mathbf{z})]$$
 - Measures how well the decoder reconstructs the input
-- Sample $$\mathbf{z}$$ from the encoder's distribution $$q_\phi(\mathbf{z}|\mathbf{x})$$
+- Sample $$\mathbf{z}$$ from the encoder's distribution $$q_\phi(\mathbf{z}\mid\mathbf{x})$$
 - Evaluate how likely the decoder thinks the original $$\mathbf{x}$$ is given $$\mathbf{z}$$
 - Similar to the reconstruction loss in standard autoencoders
 - Encourages the latent code to contain information about the input
@@ -529,7 +529,7 @@ where $$\mathbf{z}^{(l)} \sim q_\phi(\mathbf{z}|\mathbf{x})$$.
 
 If we model the decoder as:
 
-$$p_\theta(\mathbf{x}|\mathbf{z}) = \mathcal{N}(\mathbf{x}; \boldsymbol{\mu}_\theta(\mathbf{z}), \sigma^2 \mathbf{I})$$
+$$p_\theta(\mathbf{x}\mid\mathbf{z}) = \mathcal{N}(\mathbf{x}; \boldsymbol{\mu}_\theta(\mathbf{z}), \sigma^2 \mathbf{I})$$
 
 Then:
 
@@ -543,7 +543,7 @@ $$-\log p_\theta(\mathbf{x}|\mathbf{z}) \propto \|\mathbf{x} - \boldsymbol{\mu}_
 
 For binary data (e.g., black and white images), we model each dimension independently as a Bernoulli distribution:
 
-$$p_\theta(\mathbf{x}|\mathbf{z}) = \prod_{i=1}^{D} \text{Bernoulli}(x_i; p_i)$$
+$$p_\theta(\mathbf{x}\mid\mathbf{z}) = \prod_{i=1}^{D} \text{Bernoulli}(x_i; p_i)$$
 
 where $$p_i = \boldsymbol{\mu}_\theta(\mathbf{z})_i$$ (the decoder output after sigmoid activation).
 
@@ -561,7 +561,7 @@ $$D_{KL}(q_\phi(\mathbf{z}|\mathbf{x}) \| p(\mathbf{z}))$$
 
 With the choices:
 - Prior: $p(\mathbf{z}) = \mathcal{N}(\mathbf{0}, \mathbf{I})$
-- Approximate posterior: $q_\phi(\mathbf{z}|\mathbf{x}) = \mathcal{N}(\boldsymbol{\mu}_\phi(\mathbf{x}), \boldsymbol{\sigma}_\phi^2(\mathbf{x})\mathbf{I})$
+- Approximate posterior: $q_\phi(\mathbf{z}\mid\mathbf{x}) = \mathcal{N}(\boldsymbol{\mu}_\phi(\mathbf{x}), \boldsymbol{\sigma}_\phi^2(\mathbf{x})\mathbf{I})$
 
 The KL divergence between two multivariate Gaussians has a **closed-form solution**:
 
@@ -1020,8 +1020,8 @@ We've covered the complete theory and practice of Variational Autoencoders:
 2. **Autoencoders**: Deterministic encoder-decoder networks that learn compressed representations but lack generative capabilities
 
 3. **VAEs**: Probabilistic generative models that learn smooth latent spaces by:
-   - Modeling data generation as $p_\theta(\mathbf{x}|\mathbf{z})p(\mathbf{z})$
-   - Learning an approximate posterior $q_\phi(\mathbf{z}|\mathbf{x})$
+   - Modeling data generation as $p_\theta(\mathbf{x}\mid\mathbf{z})p(\mathbf{z})$
+   - Learning an approximate posterior $q_\phi(\mathbf{z}\mid\mathbf{x})$
    - Maximizing the Evidence Lower Bound (ELBO)
 
 4. **ELBO**: A tractable lower bound on the log likelihood:
