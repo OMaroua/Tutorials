@@ -285,7 +285,7 @@ $
 
 #### Inference Model (Encoder)
 
-The true posterior $$p_\theta(\mathbf{z}|\mathbf{x})$$ is intractable to compute directly. Instead, we introduce an **approximate posterior** (also called the **recognition model** or **inference network**):
+The true posterior $$\boldsymbol{p_\theta(\mathbf{z}|\mathbf{x})}$$ is intractable to compute directly. Instead, we introduce an **approximate posterior** (also called the **recognition model** or **inference network**):
 
 $$q_\phi(\mathbf{z}|\mathbf{x}) = \mathcal{N}(\mathbf{z}; \boldsymbol{\mu}_\phi(\mathbf{x}), \boldsymbol{\sigma}_\phi^2(\mathbf{x})\mathbf{I})$$
 
