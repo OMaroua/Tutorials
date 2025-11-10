@@ -11,16 +11,22 @@
     
     <!-- MathJax for LaTeX rendering -->
     <script>
-        MathJax = {
+        window.MathJax = {
             tex: {
                 inlineMath: [['$', '$'], ['\\(', '\\)']],
                 displayMath: [['$$', '$$'], ['\\[', '\\]']],
                 processEscapes: true,
                 processEnvironments: true,
-                tags: 'ams'
+                tags: 'ams',
+                packages: {'[+]': ['noerrors']}
             },
             options: {
-                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors']
             },
             svg: {
                 fontCache: 'global'
@@ -28,7 +34,7 @@
         };
     </script>
     <script type="text/javascript" id="MathJax-script" async
-        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
     </script>
     
     <!-- Syntax highlighting -->
@@ -79,6 +85,18 @@
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
+        });
+        
+        // Enhanced MathJax processing
+        window.addEventListener('load', function() {
+            if (window.MathJax) {
+                MathJax.startup.promise.then(() => {
+                    // Typeset the entire document
+                    MathJax.typesetPromise().then(() => {
+                        console.log('MathJax rendering complete');
+                    }).catch((err) => console.log('MathJax error: ' + err.message));
+                });
+            }
         });
     </script>
 </body>
