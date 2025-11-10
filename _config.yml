@@ -6,11 +6,10 @@ email: "your.email@example.com"
 url: "https://OMaroua.github.io"
 baseurl: "/Tutorials"
 
-# Theme - using custom layouts
-# theme: jekyll-theme-cayman
-# remote_theme: pages-themes/cayman@v0.2.0
+# Build settings
 plugins:
-- jekyll-feed
+  - jekyll-feed
+  - jekyll-seo-tag
 
 # Markdown settings
 markdown: kramdown
